@@ -1,0 +1,14 @@
+[Unit]
+Description=rad10d - daemon service to facillitate hardware media (mpd) control.
+
+[Service]
+Type=forking
+ExecStart=/usr/local/sbin/rad10d
+SyslocIdentifier=rad10d
+StandardOutput=null
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+Alias=rad10d.service
