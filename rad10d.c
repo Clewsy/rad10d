@@ -14,6 +14,7 @@
 
 #define TOGGLE_FALSE	0	//bool values to indicate whether a toggle button press has registered (toggle_flag)
 #define TOGGLE_TRUE	1
+#define TOGGLE_UNKNOWN	2
 
 struct mpd_connection *connection = NULL;	//Initialise globally accessible structure to contatin mpd connection info (refer "mpd/client.h")
 //function required for initialising the mpd interface via mpc.  this function pulled straight from example code
@@ -26,6 +27,19 @@ static struct mpd_connection *setup_connection(void)
 	return conn;						//return the address of the connection struct
 }
 
+//function to return the current mpd status. returns:
+//MPD_STATE_UNKNOWN     no information available
+//MPD_STATE_STOP        not playing
+//MPD_STATE_PLAY        playing
+//MPD_STATE_PAUSE       playing, but paused
+int status()
+{
+	struct mpd_status *status_struct = mpd_run_status(connection);	//creates a struct "status_struct" and fills it with info representing the status of the mpd connection "connection"
+	int status = mpd_status_get_state(status_struct);		//pulls the unknown/stop/play/pause status from "status_struct"
+	mpd_status_free(status_struct);					//releases "status_struct" from the heap
+	return status;							//returns the mpd status
+}
+
 int toggle_flag = TOGGLE_FALSE;	//initialise global variable that triggers a toggle of mpd pause/play
 //Interrupt subroutine to be triggered by pressing the toggle button
 void toggleISR ()
@@ -33,8 +47,16 @@ void toggleISR ()
 	delay(debounce_ms);				//wait for a "debounce" duration
 	if(digitalRead(toggle_pin) == 0)		//check if the toggle button is still pushed
 	{
-		toggle_flag = TOGGLE_TRUE;		//set flag that indicates the toggle button press has been registered and mpd requires a play/pause toggle
-		while(digitalRead(toggle_pin) == 0) { }	//infinite loop until toggle button is released
+
+		if(status() == (MPD_STATE_UNKNOWN || MPD_STATE_STOP))	//first check if status is neither pause nor play
+		{
+			toggle_flag = TOGGLE_UNKNOWN;			//if this is the case (e.g. first toggle after boot) set the toggle flag to TOGGLE_UNKOWN
+		}
+		else							//this is the usual condition after the toggle button is detected
+		{
+			toggle_flag = TOGGLE_TRUE;			//set flag that indicates the toggle button press has been registered and mpd requires a play/pause toggle
+		}
+		while(digitalRead(toggle_pin) == 0) { }			//infinite loop until toggle button is released
 	}
 }
 
@@ -100,9 +122,14 @@ int main(int argc, char* argv[])
 			old_encoder_value = the_encoder->value;                 //update known encoder value for next comparison
 		}
 
-		if (toggle_flag != TOGGLE_FALSE)		//if the toggle flag has been set by the toggle button isr
+		if (toggle_flag == TOGGLE_TRUE)			//if the toggle flag has been set by the toggle button isr and mpd status is either play or pause
 		{
 			mpd_run_toggle_pause(connection);	//toggle play/pause in mpd
+			toggle_flag = TOGGLE_FALSE;		//clear the toggle flag
+		}
+		else if (toggle_flag == TOGGLE_UNKNOWN)		//if the toggle flag has been set but mpd status is not yet play/pause
+		{
+			mpd_run_play(connection);		//set mpd to play
 			toggle_flag = TOGGLE_FALSE;		//clear the toggle flag
 		}
 
