@@ -47,8 +47,7 @@ void toggleISR ()
 	delay(debounce_ms);				//wait for a "debounce" duration
 	if(digitalRead(toggle_pin) == 0)		//check if the toggle button is still pushed
 	{
-
-		if(status() == (MPD_STATE_UNKNOWN || MPD_STATE_STOP))	//first check if status is neither pause nor play
+		if ((status() == MPD_STATE_UNKNOWN) || (status() == MPD_STATE_STOP)) //first check if status is neither pause nor play
 		{
 			toggle_flag = TOGGLE_UNKNOWN;			//if this is the case (e.g. first toggle after boot) set the toggle flag to TOGGLE_UNKOWN
 		}
