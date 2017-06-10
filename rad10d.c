@@ -12,13 +12,6 @@
 #define toggle_pin	1	//Play/pause toggle button
 #define debounce_ms	50	//Debounce value for toggle button (in ms)
 
-//#define TOGGLE_FALSE	0	//bool values to indicate whether a toggle button press has registered (toggle_flag)
-//#define TOGGLE_TRUE	1
-//#define TOGGLE_UNKNOWN	2
-
-//#define PLAY	1
-//#define PAUSE	0
-
 //define settings for establishing an mpd connection
 #define MPD_SERVER	"127.0.0.1"	//Set the mpd server IP to the localhost for the purpose of this daemon
 #define MPD_PORT	6600		//Use the default mpd port - 6600
