@@ -3,9 +3,9 @@
 #include <unistd.h>		//required for daemonisation
 #include <sys/stat.h>		//required for daemonisation
 
-#include <mpd/client.h>				//Required to interface with mpc (mpd client)
-#include <wiringPi.h>				//Required for utilising raspberry pi gpio
-#include "rotaryencoder/rotaryencoder.h"	//Required to interface a rotary encoder on the raspi gpio
+#include "libmpdclient-2.16/include/mpd/client.h"	//Required to interface with mpc (mpd client)
+#include <wiringPi.h>					//Required for utilising raspberry pi gpio
+#include "rotaryencoder/rotaryencoder.h"		//Required to interface a rotary encoder on the raspi gpio
 
 #define vol_encoder_A	15	//Encoder channel A
 #define vol_encoder_B	16	//Encoder channel B
@@ -15,7 +15,7 @@
 //define settings for establishing an mpd connection
 #define MPD_SERVER	"127.0.0.1"	//Set the mpd server IP to the localhost for the purpose of this daemon
 #define MPD_PORT	6600		//Use the default mpd port - 6600
-#define MPD_TIMEOUT	0		//Set the connection timeout as 0 to use the default.
+#define MPD_TIMEOUT	1000		//Set the connection timeout as 0 to use the default.
 
 struct mpd_connection *connection = NULL;	//Initialise globally accessible structure to contatin mpd connection info (refer "mpd/client.h")
 //function required for initialising the mpd interface via mpc.  this function pulled straight from example code
@@ -24,8 +24,8 @@ static struct mpd_connection *setup_connection(void)
 	struct mpd_connection *conn;
 
 	conn = mpd_connection_new(MPD_SERVER, MPD_PORT, MPD_TIMEOUT);	//settings include IP address of mpd server, port # and connection timeout
-	if (conn == NULL) { exit(EXIT_FAILURE);	}		//exit on failure to initialise mpd connection
-	return conn;						//return the address of the connection struct
+	if (conn == NULL) { exit(EXIT_FAILURE);	}			//exit on failure to initialise mpd connection
+	return conn;							//return the address of the connection struct
 }
 
 //function to return the current mpd status. returns:
@@ -47,6 +47,8 @@ void toggleISR ()
 	delay(debounce_ms);				//wait for a "debounce" duration
 	if(digitalRead(toggle_pin) == 0)		//check if the toggle button is still pushed
 	{
+		connection = setup_connection();        		//reinitialise mpc connection session (in case it has dropped out)
+
 		if ((get_mpd_status() == MPD_STATE_UNKNOWN) || (get_mpd_status() == MPD_STATE_STOP) || (get_mpd_status() == MPD_STATE_PAUSE)) //first check if status is neither pause nor play
 		{
 			mpd_run_stop(connection);
@@ -121,11 +123,12 @@ int main(int argc, char* argv[])
 			mpd_run_change_volume(connection, change);              //adjust the volume accordingly
 			old_encoder_value = the_encoder->value;                 //update known encoder value for next comparison
 		}
-	
+
 		if (mpd_connection_get_error(connection) != MPD_ERROR_SUCCESS)	//If an error event has occurred.
 		{
 			mpd_connection_clear_error(connection);		//attempt to clear any error that may arise
-		} 
+			connection = setup_connection();        	//reinitialise mpc connection session
+		}
 	}
 
 	return (0);	//never reached
