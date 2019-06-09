@@ -28,10 +28,10 @@ $ sudo systemctl start rad10d.service
 Guidance for developing the rotary encoder interface came from the work done by Andrew Stine.  
 https://github.com/astine/rotaryencoder/blob/master/rotaryencoder.c
 
-Daemon uses the MPD API library  
+Daemon uses the MPD client c library.  
 https://www.musicpd.org/doc/libmpdclient/index.html
 
-Hardware interfacing with the Raspberry Pi uses the Wiring Pi library by Drogon.  
+Hardware interfacing with the Raspberry Pi uses the Wiring Pi library by Drogon (Gordon Henderson).  
 http://wiringpi.com/
 
 # Photos
