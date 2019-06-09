@@ -25,7 +25,7 @@ $ sudo systemctl enable rad10d.service
 $ sudo systemctl start rad10d.service
 ```
 # Credits
-Developing the rotary encoder interfacing started with the work done by Andrew Stine.  
+Guidance for developing the rotary encoder interface came from the work done by Andrew Stine.  
 https://github.com/astine/rotaryencoder/blob/master/rotaryencoder.c
 
 Daemon uses the MPD API library  
