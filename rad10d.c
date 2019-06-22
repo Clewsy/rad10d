@@ -29,21 +29,25 @@ bool mpd_reconnect(void)
 {
 	mpd_connection_free(connection);		//attempt to close the mpd connection and free the memory.
 	if (init_mpd() == FALSE) { return(FALSE); };	//attempt to re-initialise a new (identical) mpd connection.
-	if (connection == NULL) { return(FALSE); }	//verify if the connection was successfully created.  if not, return false.
 
 	return(TRUE);					//connection should be successfully re-established so return true.
 }
 
 
 //return the current mpd status. returns:
-//MPD_STATE_UNKNOWN     no information available
-//MPD_STATE_STOP        not playing
-//MPD_STATE_PLAY        playing
-//MPD_STATE_PAUSE       playing, but paused
+//MPD_STATE_UNKNOWN     = 0	no information available
+//MPD_STATE_STOP        = 1	not playing
+//MPD_STATE_PLAY        = 2	playing
+//MPD_STATE_PAUSE       = 3	playing, but paused
 int get_mpd_status(void)
 {
 	struct mpd_status *status_struct = mpd_run_status(connection);	//creates a struct "status_struct" and fills it with status info of "connection".
 	int status = mpd_status_get_state(status_struct);		//pulls the unknown/stop/play/pause status from "status_struct".
+	while ((status < MPD_STATE_STOP) || (status > MPD_STATE_PAUSE))	//while the status returned is anything other than STOP, PLAY or PAUSE
+	{
+		while (mpd_reconnect() == FALSE) {};			//attempt re-establishing the mpd connection.
+		status = mpd_status_get_state(status_struct);		//re-check the current status.
+	}
 	mpd_status_free(status_struct);					//releases "status_struct" from the heap.
 
 	return(status);							//returns the mpd status.
@@ -100,10 +104,7 @@ void toggleISR(void)
 
 	if (digitalRead(TOGGLE_PIN) == 0)				//check if the toggle button is still pushed.
 	{
-		while (mpd_reconnect() == FALSE) {};			//reconnect mpd (in case it has dropped after a long idle).
-
-		if (	(get_mpd_status() == MPD_STATE_UNKNOWN) ||	//check if status is unknown OR
-			(get_mpd_status() == MPD_STATE_STOP) ||		//stopped OR
+		if (	(get_mpd_status() == MPD_STATE_STOP) ||		//check if status is stopped OR
 			(get_mpd_status() == MPD_STATE_PAUSE)	)	//paused.
 		{
 			if (mpd_run_play(connection) != TRUE)		//send the run_play command.
