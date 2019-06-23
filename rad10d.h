@@ -42,6 +42,9 @@ struct encoder
 //declare structure named the_encoder - gloablly accessible (used in ISR)
 struct encoder *the_encoder;
 
+//declare and initialise the toggleSignal flag - globally accessible (used in ISR)
+bool toggleSignal = FALSE;
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //function declarations
 static struct mpd_connection *setup_connection(void);

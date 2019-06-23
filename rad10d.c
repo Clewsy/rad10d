@@ -100,28 +100,12 @@ void updateEncoderISR(void)
 //interrupt subroutine to be triggered by pressing the toggle button.
 void toggleISR(void)
 {
-	delay(DEBOUNCE_MS);						//wait for a "debounce" duration.
+	delay(DEBOUNCE_MS);				//wait for a "debounce" duration.
 
-	if (digitalRead(TOGGLE_PIN) == 0)				//check if the toggle button is still pushed.
+	if (digitalRead(TOGGLE_PIN) == 0)		//check if the toggle button is still pushed.
 	{
-		if (	(get_mpd_status() == MPD_STATE_STOP) ||		//check if status is stopped OR
-			(get_mpd_status() == MPD_STATE_PAUSE)	)	//paused.
-		{
-			if (mpd_run_play(connection) != TRUE)		//send the run_play command.
-			{
-				while (mpd_reconnect() == FALSE) {};	//if the command fails, try reconnecting.
-				mpd_run_play(connection);		//then try the command again.
-			}
-		}
-		else							//the status here should be MPD_STATE_PLAY.
-		{
-			if (mpd_run_pause(connection, TRUE) != TRUE)	//send the pause command (this is actually a play/pause toggle).
-			{
-				while (mpd_reconnect() == FALSE) {};	//if the command fails, try reconnecting.
-				mpd_run_pause(connection, TRUE);	//then try the command again.
-			}
-		}
-		while(digitalRead(TOGGLE_PIN) == 0) { }			//infinite loop until toggle button is released.
+		toggleSignal = TRUE;			//set the flag to signal toggling play/pause.
+		while(digitalRead(TOGGLE_PIN) == 0) { }	//loop until toggle button is released.
 	}
 }
 
@@ -178,21 +162,34 @@ int main(int argc, char* argv[])
 	////////	The Payload - at this point, the programme is running as a daemon	////////
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
-	if (init_hardware() != TRUE) { exit(EXIT_FAILURE); }
-	if (init_mpd() != TRUE) {exit(EXIT_FAILURE); }
+	if (init_hardware() != TRUE) { exit(EXIT_FAILURE); }	//initialise the hardware (encoder and push button).
+	if (init_mpd() != TRUE) {exit(EXIT_FAILURE); }		//initialise mpd connection.
+
+	int currentStatus;					//integer represents the current status of mpd (play/pause/stop).
 
 	//the main infinite loop.
 	while (TRUE)
 	{
 		delay(10);	//a short delay so as to not max out cpu usage when running the main loop.
 
+		currentStatus = get_mpd_status();	//get the current status of mpd.
+							//refreshing this with every loop iteration helps prevent connection dropouts.
+
 		//if statement to poll the encoder for change.
-		//the encoder ISR can't be used to directly run the change_volume command because multiple, rapid encoder changes exceed the command buffer.
 		if (the_encoder->last_value != the_encoder->value)	//if the encoder value has changed since last checked.
 		{
 			//adjust the volume by an amount equal to the difference between the encoder value and the last encoder value.
 			mpd_run_change_volume(connection, (the_encoder->value - the_encoder->last_value));
 			the_encoder->last_value = the_encoder->value;	//update known encoder value for next comparison.
+		}
+
+		//if statement to poll the state of the toggleSignal flag.  set flag indicates button has been pressed to request play/pause toggle.
+		if (toggleSignal)
+		{
+			if (currentStatus == MPD_STATE_PLAY)	{ mpd_run_pause(connection, TRUE); }	//currently playing so pause.
+			else					{ mpd_run_play(connection); }		//currently paused or stopped, so play.
+
+			toggleSignal = FALSE;	//reset the toggleSignal flag.
 		}
 
 		//check for (and try to recover from) connection errors.
