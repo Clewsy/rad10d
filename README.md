@@ -11,7 +11,7 @@ The push-button output is connected to GPIO pin 1 (physical pin 12).
 Install the dependencies.  Standard raspbian comes with wiringpi but it needs to be installed onto rasbian lite.
 ```
 $ sudo apt update
-$ sudo install wiringpi mpd libmpdclient-dev mpc
+$ sudo apt install wiringpi mpd libmpdclient-dev mpc
 ```
 Compile the executable "rad10d":
 (Ensure the libmpdclient library is also copied into the source directory - [libmpdclient download page](https://musicpd.org/libs/libmpdclient/)).
