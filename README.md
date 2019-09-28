@@ -8,7 +8,7 @@ The rotary encoder channels A and B are connected to the Pi's GPIO pins 14 and 1
 The push-button output is connected to GPIO pin 18 (Broadcom numbering) (physical pin 12).
 
 ## Setup instructions
-Install the dependencies.  Standard raspbian comes with wiringpi but it needs to be installed onto rasbian lite.
+Install the dependencies.
 ```
 $ sudo apt update
 $ sudo apt install pigpio mpd libmpdclient-dev mpc
