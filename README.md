@@ -39,7 +39,7 @@ https://www.musicpd.org/doc/libmpdclient/index.html
 ~~Hardware interfacing with the Raspberry Pi uses the WiringPi library by Drogon (Gordon Henderson).~~  
 ~~http://wiringpi.com/~~
 
-As od August 2019, the wiringPi library has been deprecated so I transitioned to the pigpio library.  
+As of August 2019, the wiringPi library has been deprecated so I transitioned to the pigpio library.  
 http://abyz.me.uk/rpi/pigpio/index.html
 
 ## Photos
