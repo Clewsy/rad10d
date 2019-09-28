@@ -9,7 +9,7 @@ CFLAGS = -Wall -g
 
 #Library flags or names given to compilers when they are supposed to invoke the linker, ‘ld’.
 #Non-library linker flags, such as -L, should go in the LDFLAGS variable.
-LDLIBS = -lwiringPi -lmpdclient
+LDLIBS = -lpigpio -lmpdclient
 
 #The target executable file name
 TARGET = rad10d

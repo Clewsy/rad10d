@@ -1,22 +1,27 @@
 // rad10d.h - rad10d header file
-// for project deatils visit https://gitlab.com/clewsy/rad10d
+// For project deatils visit https://clews.pro/projects/rad10.html and https://gitlab.com/clewsy/rad10d
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //library inclusions
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <unistd.h>		//required for daemonisation.
-#include <sys/stat.h>		//required for daemonisation.
+#include <unistd.h>	//required for daemonisation.
+#include <sys/stat.h>	//required for daemonisation.
 
 #include "libmpdclient-2.16/include/mpd/client.h"	//Required to interface with mpc (mpd client).
-#include <wiringPi.h>					//Required for utilising raspberry pi gpio.
+#include <pigpio.h>					//Required for utilising raspberry pi gpio.
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//hardware definitions.
-#define VOL_ENCODER_A_PIN	15	//Encoder channel A.
-#define VOL_ENCODER_B_PIN	16	//Encoder channel B.
-#define TOGGLE_PIN		1	//Play/pause toggle button.
-#define DEBOUNCE_MS		50	//Debounce value for toggle button (in ms).
+//Boolean definitions.
+#define TRUE	1
+#define FALSE	0
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Hardware definitions.  Pinout numbering for use with the pigpio is the same as the Broadcom chip numbering (!= wiringPi numbering).
+#define VOL_ENCODER_A_PIN	14	//Encoder channel A.
+#define VOL_ENCODER_B_PIN	15	//Encoder channel B.
+#define TOGGLE_PIN		18	//Play/pause toggle button.
+#define DEBOUNCE_US		50000	//Debounce value for toggle button (in microseconds).
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //mpd connection definitions.
@@ -27,31 +32,31 @@
 struct mpd_connection *connection = NULL;	//Initialise globally accessible structure to contatin mpd connection info (refer "mpd/client.h").
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//global variable declarations.
+//Global variable declarations.
 
-//define the structure that represents data from the encoder
+//Define the structure that represents data from the encoder.
 struct encoder
 {
-    int channel_a;			//hardware pin to which encoder A channel is connected.
-    int channel_b;			//hardware pin to which encoder B channel is connected.
-    volatile long value;		//current value determined by the encoder.
-    volatile long last_value;		//last value determined by the encoder.  value & last_value are compared to determine volume delta.
-    volatile int last_code;		//last code needed to compare current read from channels a & b to last read.
+	int channel_a;			//Hardware pin to which encoder A channel is connected.
+	int channel_b;			//Hardware pin to which encoder B channel is connected.
+	volatile long value;		//Current value determined by the encoder.
+	volatile long last_value;	//Last value determined by the encoder.  value & last_value are compared to determine volume delta.
+	volatile int last_code;		//Last code needed to compare current read from channels a & b to last read.
 };
 
-//declare structure named the_encoder - gloablly accessible (used in ISR)
+//Declare structure named the_encoder - gloablly accessible (used in ISR).
 struct encoder *the_encoder;
 
-//declare and initialise the toggleSignal flag - globally accessible (used in ISR)
+//Declare and initialise the toggleSignal flag - globally accessible (used in ISR).
 bool toggleSignal = FALSE;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//function declarations
+//Function declarations.
 static struct mpd_connection *setup_connection(void);
 bool init_mpd(void);
 bool mpd_reconnect(void);
 int get_mpd_status(void);
 struct encoder *init_encoder(int channel_a, int channel_b);
-void updateEncoderISR(void);
-void toggleISR(void);
+void updateEncoderISR(int gpio, int level, uint32_t tick);
+void toggleISR(int gpio, int level, uint32_t tick);
 bool init_hardware(void);
