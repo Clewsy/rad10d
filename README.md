@@ -13,9 +13,11 @@ Install the dependencies.
 $ sudo apt update
 $ sudo apt install pigpio mpd libmpdclient-dev mpc
 ```
-Compile the executable "rad10d":
+Clone this repo and compile the executable "rad10d":
 (Ensure the libmpdclient library is also copied into the source directory - [libmpdclient download page](https://musicpd.org/libs/libmpdclient/)).
 ```
+$ git clone https://gitlab.com/clewsy/rad10d
+$ cd rad10d
 $ make all
 ```
 Copy files to system directories:
