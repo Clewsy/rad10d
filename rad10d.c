@@ -146,7 +146,7 @@ int main(int argc, char* argv[])
 	umask(0);					//Unmask the file mode - allow the daemon to open, read and write any file anywhere.
 
 	sid = setsid();					//Set new session and allocate session id.  if successful, child process is now process group leader.
-	if(sid < 0) { exit(EXIT_FAILURE); }		//If setsid fails, exit.
+	if(sid < 0) { exit(EXIT_FAILURE); }		//If setsid failed, exit.
 
 	if ((chdir("/")) < 0) { exit(EXIT_FAILURE); } 	//Change working directory. If we can't find the directory we exit with failure.
 
@@ -162,10 +162,13 @@ int main(int argc, char* argv[])
 	if (init_hardware() != TRUE) { exit(EXIT_FAILURE); }	//Initialise the hardware (encoder and push button).
 	if (init_mpd() != TRUE) { exit(EXIT_FAILURE); }		//Initialise mpd connection.
 
+	int current_status;	//Initialise integer to indicate current mpd playing status.
+
 	//The main infinite loop.
 	while (TRUE)
 	{
-		gpioDelay(10000);	//A short delay (10000microseconds = 10ms) so as to not max out cpu usage when running the main loop.
+		gpioDelay(10000);			//A delay (10000microseconds = 10ms) so as to not max out cpu usage when running the main loop.
+		current_status = get_mpd_status();	//Regularly checking mpd status prevents the connection being dropped. 
 
 		//if statement to poll the encoder for change.
 		if (the_encoder->last_value != the_encoder->value)	//if the encoder value has changed since last checked.
@@ -178,7 +181,7 @@ int main(int argc, char* argv[])
 		//If statement to poll the state of the toggleSignal flag.  A set flag indicates button has been pressed to request play/pause toggle.
 		if (toggleSignal)
 		{
-			if (get_mpd_status() == MPD_STATE_PLAY)	{ mpd_run_pause(connection, TRUE); }	//Currently playing so pause.
+			if (current_status == MPD_STATE_PLAY)	{ mpd_run_pause(connection, TRUE); }	//Currently playing so pause.
 			else					{ mpd_run_play(connection); }		//Currently paused or stopped, so play.
 
 			toggleSignal = FALSE;	//Reset the toggleSignal flag.
