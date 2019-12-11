@@ -9,25 +9,25 @@ The push-button output is connected to GPIO pin 18 (Broadcom numbering) (physica
 
 ## Setup instructions
 Install the dependencies.
-```
+```console
 $ sudo apt update
 $ sudo apt install pigpio mpd libmpdclient-dev mpc
 ```
 Clone this repo and compile the executable "rad10d":
 (Ensure the libmpdclient library is also copied into the source directory - [libmpdclient download page](https://musicpd.org/libs/libmpdclient/)).
-```
+```console
 $ git clone https://gitlab.com/clewsy/rad10d
 $ cd rad10d
 $ make all
 ```
 Copy files to system directories:
-```
+```console
 $ sudo cp rad10d /usr/local/sbin/rad10d
 $ sudo cp rad10d.service /lib/systemd/system/rad10d.service
 ```
 Enable and start the service:  
 (This service is created so that the daemon runs at boot).
-```
+```console
 $ sudo systemctl enable rad10d.service
 $ sudo systemctl start rad10d.service
 ```
