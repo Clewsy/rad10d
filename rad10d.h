@@ -5,11 +5,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <unistd.h>	//required for daemonisation.
-#include <sys/stat.h>	//required for daemonisation.
+#include <unistd.h>		//required for daemonisation.
+#include <sys/stat.h>		//required for daemonisation.
 
-#include "libmpdclient-2.16/include/mpd/client.h"	//Required to interface with mpc (mpd client).
-#include <pigpio.h>					//Required for utilising raspberry pi gpio.
+#include <mpd/client.h>		//Required to interface with mpc (mpd client).
+#include <pigpio.h>		//Required for utilising raspberry pi gpio.
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Boolean definitions.

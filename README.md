@@ -5,16 +5,20 @@ My hardware implementation includes a Raspberry Pi 3 with a small amplifier boar
 
 The rotary encoder channels A and B are connected to the Pi's GPIO pins 14 and 15 (Broadcom numbering) respectively (physical pins 8 & 10).  
 
-The push-button is connected to GPIO pin 18 (Broadcom numbering) (physical pin 12).
+The push-button is connected to GPIO pin 18 (Broadcom numbering) (physical pin 12).  
 
 ## Setup instructions
 Install the dependencies.
 ```shell
 $ sudo apt update
-$ sudo apt install pigpio mpd libmpdclient-dev mpc
+$ sudo apt install pigpio mpd mpc libmpdclient-dev
 ```
+Notes:
+* Instead of using the package manager to install the mpdclient library (libmpdclient-dev), you can obtain it directly from the [libmpdclient download page](https://musicpd.org/libs/libmpdclient/).
+* You don't neccessarily need to install mpc for this project, but it's a great tool for controlling mpd from the command line and also useful for debugging.
+
 Clone this repo and compile the executable "rad10d":
-(Ensure the libmpdclient library is also copied into the source directory - [libmpdclient download page](https://musicpd.org/libs/libmpdclient/)).
+(Ensure the libmpdclient library is also copied into the source directory - ).
 ```shell
 $ git clone https://gitlab.com/clewsy/rad10d
 $ cd rad10d
