@@ -55,7 +55,7 @@ From within this directory, delete any existing files then copy the webui files 
 ```shell
 $ cd /var/www/html
 $ sudo rm -r *
-$ sudo cp --recursive ~/rad10/webui/* .		## Change to suit wherever you cloned the rad10 repository. 
+$ sudo cp --recursive ~/rad10/webui/* .	## Change to suit wherever you cloned the rad10 repository. 
 ```
 The web interface should now be available over your local network.  If the hostname of your raspberry pi remains as the default, then the p0wer WebUI should be accessible from your browser at http://raspberrypi/
 
