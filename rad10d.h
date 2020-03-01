@@ -26,7 +26,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //mpd connection definitions.
 #define MPD_SERVER	"127.0.0.1"	//Set the mpd server IP to the localhost for the purpose of this daemon.
-#define MPD_PORT	6600		//Use the default mpd port - 6600.
+#define MPD_PORT	6600		//Use the default mpd port - 6600.  If the default is not used, this must match "port" in /etc/mpd.conf
 #define MPD_TIMEOUT	1000		//Connection timeout (in ms).  Set to 0 to use the default.
 
 struct mpd_connection *connection = NULL;	//Initialise globally accessible structure to contatin mpd connection info (refer "mpd/client.h").

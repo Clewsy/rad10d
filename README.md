@@ -35,6 +35,31 @@ Enable and start the service:
 $ sudo systemctl enable rad10d.service
 $ sudo systemctl start rad10d.service
 ```
+
+## WebUI
+Although not required for the hardware functionality enabled by following the instructions above, this repository also includes a simple web-based user interface (WebUI) for similar control of mpd on the raspberry pi.  
+
+The interface is written in php/html/css and just gives a play/pause toggle button and volume up/down control.  
+
+It also includes a couple of "presets" that I typically use.  
+
+To install the WebUI, the raspberry pi will require installation of php and web server software such as [Apache](https://httpd.apache.org/), [NGinX](https://nginx.org/), [Lighttpd](https://www.lighttpd.net/) or similar.  The following instructions will use Apache.
+
+```shell
+$ sudo apt update
+$ sudo apt install apache2 php
+```
+By default, Apache will serve the html/css/php files stored at the /var/www/html directory.
+
+From within this directory, delete any existing files then copy the webui files from the previously cloned repository:
+
+```shell
+$ cd /var/www/html
+$ sudo rm -r *
+$ sudo cp --recursive ~/rad10/webui/* .		## Change to suit wherever you cloned the rad10 repository. 
+```
+The web interface should now be available over your local network.  If the hostname of your raspberry pi remains as the default, then the p0wer WebUI should be accessible from your browser at http://raspberrypi/
+
 ## Credits
 Guidance for developing the rotary encoder interface came from the work done by Andrew Stine.  
 https://github.com/astine/rotaryencoder/blob/master/rotaryencoder.c
@@ -51,6 +76,12 @@ http://abyz.me.uk/rpi/pigpio/index.html
 ## Photos
 Here's my internet rad10!
 
-![rad10 Front View,](photos/rad10_front.jpg)
+![rad10 Front View](photos/rad10_front.jpg)
 
-![rad10 Back View,](photos/rad10_back.jpg)
+![rad10 Back View](photos/rad10_back.jpg)
+
+Some screenshots of the WebUI on an android smartphone:
+
+![rad10 WebUI](photos/rad10_webui_1.png)
+
+![rad10 WebUI](photos/rad10_webui_2.png)
