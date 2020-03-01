@@ -15,10 +15,9 @@ $ sudo apt install pigpio mpd mpc libmpdclient-dev
 ```
 Notes:
 * Instead of using the package manager to install the mpdclient library (libmpdclient-dev), you can obtain it directly from the [libmpdclient download page](https://musicpd.org/libs/libmpdclient/).
-* You don't neccessarily need to install mpc for this project, but it's a great tool for controlling mpd from the command line and also useful for debugging.
+* You don't neccessarily need to install mpc for this project, but it's a great tool for controlling mpd from the command line and also useful for debugging.  It is required however if you wish to use the WebUI.
 
 Clone this repo and compile the executable "rad10d":
-(Ensure the libmpdclient library is also copied into the source directory - ).
 ```shell
 $ git clone https://gitlab.com/clewsy/rad10d
 $ cd rad10d
