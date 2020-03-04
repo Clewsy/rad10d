@@ -1,14 +1,15 @@
 // rad10d.h - rad10d header file
-// For project deatils visit https://clews.pro/projects/rad10.html and https://gitlab.com/clewsy/rad10d
+// For project details visit https://clews.pro/projects/rad10.html and https://gitlab.com/clewsy/rad10d
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//library inclusions
+//library inclusions.
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <unistd.h>		//required for daemonisation.
 #include <sys/stat.h>		//required for daemonisation.
 
-#include <mpd/client.h>		//Required to interface with mpc (mpd client).
+#include <mpd/client.h>		//Required to interface with mpd.
 #include <pigpio.h>		//Required for utilising raspberry pi gpio.
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -17,7 +18,7 @@
 #define FALSE	0
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Hardware definitions.  Pinout numbering for use with the pigpio is the same as the Broadcom chip numbering (!= wiringPi numbering).
+//Hardware definitions.  Pinout numbering for use with the pigpio is the same as the Broadcom chip numbering (note, != wiringPi numbering).
 #define VOL_ENCODER_A_PIN	14	//Encoder channel A.
 #define VOL_ENCODER_B_PIN	15	//Encoder channel B.
 #define TOGGLE_PIN		18	//Play/pause toggle button.
@@ -27,9 +28,10 @@
 //mpd connection definitions.
 #define MPD_SERVER	"127.0.0.1"	//Set the mpd server IP to the localhost for the purpose of this daemon.
 #define MPD_PORT	6600		//Use the default mpd port - 6600.  If the default is not used, this must match "port" in /etc/mpd.conf
-#define MPD_TIMEOUT	1000		//Connection timeout (in ms).  Set to 0 to use the default.
+#define MPD_TIMEOUT	1000		//Connection timeout (in ms).
+#define IDLE_DELAY	10000		//Delay within the main loop to reduce cpu load (in ms).
 
-struct mpd_connection *connection = NULL;	//Initialise globally accessible structure to contatin mpd connection info (refer "mpd/client.h").
+struct mpd_connection *connection = NULL;	//Initialise globally accessible structure contatining mpd connection info (refer "mpd/client.h").
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Global variable declarations.

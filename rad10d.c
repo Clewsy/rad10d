@@ -1,5 +1,6 @@
-// rad10d.h - rad10d header file
-// For project deatils visit https://clews.pro/projects/rad10.html and https://gitlab.com/clewsy/rad10d
+// rad10d.c - rad10d c code file
+// For project details visit https://clews.pro/projects/rad10.html and https://gitlab.com/clewsy/rad10d
+
 #include "rad10d.h"
 
 
@@ -17,7 +18,7 @@ static struct mpd_connection *setup_connection(void)
 //Initialise the mpd connection.
 bool init_mpd(void)
 {
-	connection = setup_connection();			//Initialise mpc connection session.
+	connection = setup_connection();			//Initialise mpd connection session.
 	if(connection == NULL) { return(FALSE); }		//Confirm "connection" was successfully set up.  If not, return false.
 	mpd_connection_set_keepalive(connection, TRUE);		//Enable TCP keepalives to prevent disconnection in the event of a long idle duration.
 
@@ -35,7 +36,7 @@ bool mpd_reconnect(void)
 }
 
 
-//return the current mpd status. returns:
+//Return the current mpd status. Possible return values:
 //MPD_STATE_UNKNOWN     = 0	no information available
 //MPD_STATE_STOP        = 1	not playing
 //MPD_STATE_PLAY        = 2	playing
@@ -58,13 +59,13 @@ int get_mpd_status(void)
 //Function to initialise the struct that reflects the state of the encoder.
 struct encoder *init_encoder(int channel_a, int channel_b)
 {
-	the_encoder = malloc(sizeof(struct encoder));			//Allocates heap memory for globally accesible "the_encoder".
+	the_encoder = malloc(sizeof(struct encoder));		//Allocates heap memory for globally accesible "the_encoder".
 
-	the_encoder->channel_a = channel_a;				//Define the encoder channel a pin.
-	the_encoder->channel_b = channel_b;				//Define the encoder channel b pin.
-	the_encoder->value = 0;						//Initialise the encoder value.
-	the_encoder->last_value = 0;					//Initialise the last encoder value (for comparing to current value).
-	the_encoder->last_code = 0;					//Initialise last_code value (to recalculate value).
+	the_encoder->channel_a = channel_a;			//Define the encoder channel a pin.
+	the_encoder->channel_b = channel_b;			//Define the encoder channel b pin.
+	the_encoder->value = 0;					//Initialise the encoder value.
+	the_encoder->last_value = 0;				//Initialise the last encoder value (for comparing to current value).
+	the_encoder->last_code = 0;				//Initialise last_code value (to recalculate value).
 
 	if (gpioSetPullUpDown(channel_a, PI_PUD_UP) != 0) { return(NULL); }			//Enable pull-up resistor on channel a pin.
 	if (gpioSetPullUpDown(channel_b, PI_PUD_UP) != 0) { return(NULL); }			//Enable pull-up resistor on channel b pin.
@@ -116,7 +117,7 @@ void toggleISR(int gpio, int level, uint32_t tick)
 //Initialise the hardware inputs - two channels on the rotary encoder and a push-button.
 bool init_hardware(void)
 {
-	if (gpioInitialise() == PI_INIT_FAILED) { return(FALSE); }	//Initialise gpio pins on raspi, return false if failure.
+	if (gpioInitialise() == PI_INIT_FAILED) { return(FALSE); }				//Initialise gpio pins on raspi, return false if failure.
 
 	if (gpioSetMode(TOGGLE_PIN, PI_INPUT) != 0) { return(FALSE); }				//Set as input the pin to which the toggle button is connected.
 	if (gpioSetPullUpDown(TOGGLE_PIN, PI_PUD_UP) != 0) { return(FALSE); }			//Enable internal pull-up resistor on the toggle pin.
@@ -167,21 +168,21 @@ int main(int argc, char* argv[])
 	//The main infinite loop.
 	while (TRUE)
 	{
-		gpioDelay(10000);			//A delay (10000microseconds = 10ms) so as to not max out cpu usage when running the main loop.
+		gpioDelay(IDLE_DELAY);			//A delay so as to not max out cpu usage when running the main loop.
 		current_status = get_mpd_status();	//Regularly checking mpd status prevents the connection being dropped. 
 
-		//if statement to poll the encoder for change.
-		if (the_encoder->last_value != the_encoder->value)	//if the encoder value has changed since last checked.
+		//If statement to poll the encoder for change.
+		if (the_encoder->last_value != the_encoder->value)	//If the encoder value has changed since last checked.
 		{
-			//adjust the volume by an amount equal to the difference between the encoder value and the last encoder value.
+			//Adjust the volume by an amount equal to the difference between the encoder value and the last encoder value.
 			mpd_run_change_volume(connection, (the_encoder->value - the_encoder->last_value));
-			the_encoder->last_value = the_encoder->value;	//update known encoder value for next comparison.
+			the_encoder->last_value = the_encoder->value;	//Update known encoder value for next comparison.
 		}
 
 		//If statement to poll the state of the toggleSignal flag.  A set flag indicates button has been pressed to request play/pause toggle.
 		if (toggleSignal)
 		{
-			if (current_status == MPD_STATE_PLAY)	{ mpd_run_pause(connection, TRUE); }	//Currently playing so pause.
+			if (current_status == MPD_STATE_PLAY)	{ mpd_run_pause(connection, TRUE); }	//Currently playing, so pause.
 			else					{ mpd_run_play(connection); }		//Currently paused or stopped, so play.
 
 			toggleSignal = FALSE;	//Reset the toggleSignal flag.
