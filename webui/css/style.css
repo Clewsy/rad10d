@@ -1,4 +1,3 @@
-
 body {
 	font-family: monospace;
 	font-size: 12px;
@@ -24,8 +23,8 @@ input.text_button {
 	color: black;
 	background-color: rgb(150,150,150);
 	margin: 10px 0px 0px 0px;
-	height: 60;
-	width: 200;
+	height: 60px;
+	width: 200px;
 	border-radius: 20px;
 	border-color: black;
 	border-style: solid;
@@ -33,12 +32,12 @@ input.text_button {
 }
 
 input.large_button {
-	height: 300;
-	width: 300;
+	height: 300px;
+	width: 300px;
 }
 input.small_button {
-	height: 100;
-	width: 100;
+	height: 100px;
+	width: 100px;
 }
 
 input:active {
