@@ -1,5 +1,5 @@
 # rad10d
-A daemon written for an internet radio project using a raspberry pi.  The daemon interfaces with the mpd client api to allow volume and play/pause toggle control via a rotary encoder with push-button.  Roatating the encoder adjusts the volume, the push-button toggles play/pause.  Simple!  
+A daemon written for an internet radio project using a raspberry pi.  The daemon interfaces with the mpd client api to allow volume and play/pause toggle control via a rotary encoder with push-button.  Rotating the encoder adjusts the volume, the push-button toggles play/pause.  Simple!  
 
 My hardware implementation includes a Raspberry Pi 3 with a small amplifier board connected to the 3.5mm audio jack.  The amplifier is set up with a mono output to a single speaker.  
 
@@ -40,7 +40,7 @@ Although not required for the hardware functionality enabled by following the in
 
 The interface is written in php/html/css and just gives a play/pause toggle button and volume up/down control.  
 
-It also includes a couple of "presets" that I typically use.  
+It also includes a couple of "presets" that I often use.  
 
 To install the WebUI, the raspberry pi will require installation of php and web server software such as [Apache][link_web_apache], [NGinX][link_web_nginx], [Lighttpd][link_web_lighttpd] or similar.  The following instructions will use Apache.
 
@@ -48,7 +48,7 @@ To install the WebUI, the raspberry pi will require installation of php and web 
 $ sudo apt update
 $ sudo apt install apache2 php
 ```
-By default, Apache will serve the html/css/php files stored at the /var/www/html directory.
+By default, Apache will serve the html/css/php files stored in the /var/www/html/ directory.
 
 From within this directory, delete any existing files then copy the webui files from the previously cloned repository:
 
