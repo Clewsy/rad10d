@@ -7,6 +7,8 @@ The rotary encoder channels A and B are connected to the Pi's GPIO pins 14 and 1
 
 The push-button is connected to GPIO pin 18 (Broadcom numbering) (physical pin 12).  
 
+Additional project detail and photos can be found [here][link_clews_projects_rad10].
+
 ## Setup instructions
 Install the dependencies.
 ```shell
@@ -80,6 +82,8 @@ Some screenshots of the WebUI on an android smartphone:
 ![rad10 WebUI][image_rad10_webui_1]
 
 ![rad10 WebUI][image_rad10_webui_2]
+
+[link_clews_projects_rad10]:https://clews.pro/projects/rad10.html
 
 [link_web_libmpdclient_download]:https://musicpd.org/libs/libmpdclient/
 [link_web_apache]:https://httpd.apache.org/
