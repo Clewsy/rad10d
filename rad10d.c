@@ -99,16 +99,43 @@ void updateEncoderISR(int gpio, int level, uint32_t tick)
 	the_encoder->last_code = code;	//Update value of last_code for use next time this ISR is triggered.
 }
 
+
 //Interrupt subroutine to be triggered by pressing the toggle button.
 //The gpioSetISRFunc requires ISRs such as this to receive gpio, level and tick.
 void toggleISR(int gpio, int level, uint32_t tick)
 {
 	if ((tick > (last_button_trigger + DEBOUNCE_US)) && (gpioRead(TOGGLE_PIN) == HIGH))
 	{
-		toggle_signal = TRUE;
+		if (block_toggle)	{block_toggle = FALSE;}		//Ignore the toggle if the button was used to send a stop signal.
+		else			{toggle_signal = TRUE;}		//Flag toggle with a normal press.
+
 		last_button_trigger = tick;
 	}
 }
+
+
+//Function returns true if the toggle button has been held down for a specified duration (TOGGLE_BUTTON_LONG_PRESS microseconds).
+bool toggle_long_press(void)
+{
+	if (gpioRead(TOGGLE_PIN) == LOW)						//If the button is pressed.
+	{
+		if (toggle_button_held == FALSE)					//If this is the first iteration when the button has been pressed.
+		{
+			time_when_pressed = gpioTick();					//Record the time the press was first flagged.
+			toggle_button_held = TRUE;					//Set the flag so that the next iteration doesn't reset the timer.
+		}
+
+		if (gpioTick() > (time_when_pressed + TOGGLE_BUTTON_LONG_PRESS))	//If the button is held for duration exceeding TOGGLE_BUTTON_LONG_PRESS
+		{
+			block_toggle = TRUE;						//Set the stop flag (so button ISR ignores when the button is released).
+			return(TRUE);							//Return true: button long press true.
+		}
+	}
+	else { toggle_button_held = FALSE; }						//Clear the flag that indicates the button is being held.
+
+	return(FALSE);									//Return false: button long press false.
+}
+
 
 //Initialise the hardware inputs - two channels on the rotary encoder and a push-button.
 bool init_hardware(void)
@@ -124,6 +151,7 @@ bool init_hardware(void)
 
 	return(TRUE);
 }
+
 
 //Main program loop.  arguments (argv[]) and number of arguments (argc) ignored.
 int main(int argc, char* argv[])
@@ -158,7 +186,7 @@ int main(int argc, char* argv[])
 	if (init_hardware() != TRUE) { exit(EXIT_FAILURE); }	//Initialise the hardware (encoder and push button).
 	if (init_mpd() != TRUE) { exit(EXIT_FAILURE); }		//Initialise mpd connection.
 
-	int current_status;	//Initialise integer to indicate current mpd playing status.
+	int current_status;		//Initialise integer to indicate current mpd playing status.
 
 	//The main infinite loop.
 	while (TRUE)
@@ -174,7 +202,10 @@ int main(int argc, char* argv[])
 			the_encoder->last_value = the_encoder->value;	//Update known encoder value for next comparison.
 		}
 
-		//If statement to poll the state of the toggleSignal flag.  A set flag indicates button has been pressed to request play/pause toggle.
+		//If the toggle button has been held for an extended duration, send the stop command to mpd.
+		if (toggle_long_press()) {mpd_run_stop(connection);}
+
+		//If statement to poll the state of the toggle_signal flag.  A set flag indicates button has been pressed to request play/pause toggle.
 		if (toggle_signal)
 		{
 			if (current_status == MPD_STATE_PLAY)	{ mpd_run_pause(connection, TRUE); }	//Currently playing, so pause.
