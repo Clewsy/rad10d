@@ -22,6 +22,8 @@
 #define VOL_ENCODER_A_PIN	14	//Encoder channel A.
 #define VOL_ENCODER_B_PIN	15	//Encoder channel B.
 #define TOGGLE_PIN		18	//Play/pause toggle button.
+#define LOW			0	//Pin grounded (e.g. button pressed).
+#define HIGH			1	//Pin pulled high.
 #define DEBOUNCE_US		50000	//Debounce value for toggle button (in microseconds).
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,8 +51,9 @@ struct encoder
 //Declare structure named the_encoder - gloablly accessible (used in ISR).
 struct encoder *the_encoder;
 
-//Declare and initialise the toggleSignal flag - globally accessible (used in ISR).
-bool toggleSignal = FALSE;
+//Declare and initialise the variables referenced in the button toggle ISR.
+bool toggle_signal = FALSE;	//Flag indicates whether or not a button press has been registered.
+uint32_t last_button_trigger = 0;	//Timer value (microseconds) used as a reference to debounce button press.
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Function declarations.

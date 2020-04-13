@@ -69,8 +69,8 @@ struct encoder *init_encoder(int channel_a, int channel_b)
 
 	if (gpioSetPullUpDown(channel_a, PI_PUD_UP) != 0) { return(NULL); }			//Enable pull-up resistor on channel a pin.
 	if (gpioSetPullUpDown(channel_b, PI_PUD_UP) != 0) { return(NULL); }			//Enable pull-up resistor on channel b pin.
-	if (gpioSetISRFunc(channel_a, EITHER_EDGE, 100, updateEncoderISR) !=0) { return(NULL); }//Enable hardware interrupt input on encoder channel a pin and define routine to run.
-	if (gpioSetISRFunc(channel_b, EITHER_EDGE, 100, updateEncoderISR) !=0) { return(NULL); }//Enable hardware interrupt input on encoder channel b pin and define routine to run.
+	if (gpioSetISRFunc(channel_a, EITHER_EDGE, 100, &updateEncoderISR) !=0) { return(NULL); }//Enable hardware interrupt input on encoder channel a pin and define routine to run.
+	if (gpioSetISRFunc(channel_b, EITHER_EDGE, 100, &updateEncoderISR) !=0) { return(NULL); }//Enable hardware interrupt input on encoder channel b pin and define routine to run.
 
 	return(the_encoder);	//Return address of "*the_encoder".
 }
@@ -99,20 +99,16 @@ void updateEncoderISR(int gpio, int level, uint32_t tick)
 	the_encoder->last_code = code;	//Update value of last_code for use next time this ISR is triggered.
 }
 
-
 //Interrupt subroutine to be triggered by pressing the toggle button.
-//The gpioSetISRFunc requires ISRs such as this to receive gpio, level and tick.  These values are ignored in this use-case.
+//The gpioSetISRFunc requires ISRs such as this to receive gpio, level and tick.
 void toggleISR(int gpio, int level, uint32_t tick)
 {
-	gpioDelay(DEBOUNCE_US);				//Wait for a "debounce" duration.
-
-	if (gpioRead(TOGGLE_PIN) == 0)			//Check if the toggle button is still pushed.
+	if ((tick > (last_button_trigger + DEBOUNCE_US)) && (gpioRead(TOGGLE_PIN) == HIGH))
 	{
-		toggleSignal = TRUE;			//Set the flag to signal toggling play/pause.
-		while(gpioRead(TOGGLE_PIN) == 0) { }	//Loop until toggle button is released.
+		toggle_signal = TRUE;
+		last_button_trigger = tick;
 	}
 }
-
 
 //Initialise the hardware inputs - two channels on the rotary encoder and a push-button.
 bool init_hardware(void)
@@ -121,14 +117,13 @@ bool init_hardware(void)
 
 	if (gpioSetMode(TOGGLE_PIN, PI_INPUT) != 0) { return(FALSE); }				//Set as input the pin to which the toggle button is connected.
 	if (gpioSetPullUpDown(TOGGLE_PIN, PI_PUD_UP) != 0) { return(FALSE); }			//Enable internal pull-up resistor on the toggle pin.
-	if (gpioSetISRFunc(TOGGLE_PIN, FALLING_EDGE, 1000, &toggleISR) != 0) { return(FALSE); }	//Set up interrupt on the toggle button.
+	if (gpioSetISRFunc(TOGGLE_PIN, RISING_EDGE, 0, &toggleISR) != 0) { return(FALSE); }	//Set up interrupt on the toggle button.
 
 	the_encoder = init_encoder(VOL_ENCODER_A_PIN, VOL_ENCODER_B_PIN);			//Initialise values stored in global struct "the_encoder".
 	if (the_encoder == NULL) { return(FALSE); }						//Return false if initialisation fails.
 
 	return(TRUE);
 }
-
 
 //Main program loop.  arguments (argv[]) and number of arguments (argc) ignored.
 int main(int argc, char* argv[])
@@ -180,12 +175,12 @@ int main(int argc, char* argv[])
 		}
 
 		//If statement to poll the state of the toggleSignal flag.  A set flag indicates button has been pressed to request play/pause toggle.
-		if (toggleSignal)
+		if (toggle_signal)
 		{
 			if (current_status == MPD_STATE_PLAY)	{ mpd_run_pause(connection, TRUE); }	//Currently playing, so pause.
 			else					{ mpd_run_play(connection); }		//Currently paused or stopped, so play.
 
-			toggleSignal = FALSE;	//Reset the toggleSignal flag.
+			toggle_signal = FALSE;
 		}
 
 		//Check for (and try to recover from) connection errors.
