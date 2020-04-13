@@ -62,7 +62,7 @@ $ sudo cp --recursive ~/rad10/webui/* .	## Change to suit wherever you cloned th
 The web interface should now be available over your local network.  If the hostname of your raspberry pi remains as the default, then the rad10 WebUI should be accessible from your browser at http://raspberrypi/
 
 ## Credits
-Guidance for developing the rotary encoder interface came from the [work done by Andrew Stine][link_web_andrew_stine].  
+A starting point for developing the rotary encoder interface daemon came from the [work done by Andrew Stine][link_web_andrew_stine].  
 
 Daemon uses the [MPD client c library][link_web_libmpdclient_library].  
 
@@ -89,6 +89,7 @@ Some screenshots of the WebUI on an android smartphone:
 [link_web_apache]:https://httpd.apache.org/
 [link_web_nginx]:https://nginx.org/
 [link_web_lighttpd]:https://www.lighttpd.net/
+[link_web_andrews_stine]:https://github.com/astine/rotaryencoder/blob/master/rotaryencoder.c
 [link_web_libmpdclient_library]:https://www.musicpd.org/doc/libmpdclient/index.html
 [link_web_wiringpi]:http://wiringpi.com/
 [link_web_wiringpi_deprecated]:http://wiringpi.com/wiringpi-deprecated/
