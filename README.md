@@ -89,7 +89,7 @@ Some screenshots of the WebUI on an android smartphone:
 [link_web_apache]:https://httpd.apache.org/
 [link_web_nginx]:https://nginx.org/
 [link_web_lighttpd]:https://www.lighttpd.net/
-[link_web_andrews_stine]:https://github.com/astine/rotaryencoder/blob/master/rotaryencoder.c
+[link_web_andrew_stine]:https://github.com/astine/rotaryencoder/blob/master/rotaryencoder.c
 [link_web_libmpdclient_library]:https://www.musicpd.org/doc/libmpdclient/index.html
 [link_web_wiringpi]:http://wiringpi.com/
 [link_web_wiringpi_deprecated]:http://wiringpi.com/wiringpi-deprecated/
