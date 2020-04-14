@@ -1,11 +1,15 @@
 # rad10d
-A daemon written for an internet radio project using a raspberry pi.  The daemon interfaces with the mpd client api to allow volume and play/pause toggle control via a rotary encoder with push-button.  Rotating the encoder adjusts the volume, the push-button toggles play/pause.  Simple!  
+A daemon written for an internet radio project using a raspberry pi.  The daemon interfaces with the mpd client api to allow *volume* and *play/pause* toggle control via a rotary encoder with push-button.  Rotating the encoder adjusts the volume, the push-button toggles play/pause.  Simple!  
+
+At least that's how it started.  Eventually I added the ability to *stop* by pressing and holding the toggle button for a couple of seconds.  This became useful fore when I want to restart a track or if a live-stream drops out.
 
 My hardware implementation includes a Raspberry Pi 3 with a small amplifier board connected to the 3.5mm audio jack.  The amplifier is set up with a mono output to a single speaker.  
 
 The rotary encoder channels A and B are connected to the Pi's GPIO pins 14 and 15 (Broadcom numbering) respectively (physical pins 8 & 10).  
 
 The push-button is connected to GPIO pin 18 (Broadcom numbering) (physical pin 12).  
+
+Although it is independent to the daemon, this repo also includes a simple web interface for controling mpd.
 
 Additional project detail and photos can be found [here][link_clews_projects_rad10].
 
