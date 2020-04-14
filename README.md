@@ -1,7 +1,7 @@
 # rad10d
-A daemon written for an internet radio project using a raspberry pi.  The daemon interfaces with the mpd client api to allow *volume* and *play/pause* toggle control via a rotary encoder with push-button.  Rotating the encoder adjusts the volume, the push-button toggles play/pause.  Simple!  
+A daemon written for an internet radio project using a raspberry pi.  The daemon interfaces with the mpd client api to allow **volume** and **play/pause** toggle control via a rotary encoder with push-button.  Rotating the encoder adjusts the volume, the push-button toggles play/pause.  Simple!  
 
-At least that's how it started.  Eventually I added the ability to *stop* by pressing and holding the toggle button for a couple of seconds.  This became useful fore when I want to restart a track or if a live-stream drops out.
+At least that's how it started.  Eventually I added the ability to **stop** by pressing and holding the toggle button for a couple of seconds.  This became useful for when I want to restart a track or if a live-stream drops out.
 
 My hardware implementation includes a Raspberry Pi 3 with a small amplifier board connected to the 3.5mm audio jack.  The amplifier is set up with a mono output to a single speaker.  
 
@@ -23,7 +23,7 @@ Notes:
 * Instead of using the package manager to install the mpdclient library (libmpdclient-dev), you can obtain it directly from the [libmpdclient download page][link_web_libmpdclient_download].
 * You don't neccessarily need to install mpc for this project, but it's a great tool for controlling mpd from the command line and also useful for debugging.  It is required however if you wish to use the WebUI.
 
-Clone this repo and compile the executable "rad10d":
+Clone this repo and compile the executable **rad10d**:
 ```shell
 $ git clone https://gitlab.com/clewsy/rad10d
 $ cd rad10d
@@ -42,7 +42,7 @@ $ sudo systemctl start rad10d.service
 ```
 
 ## WebUI
-Although not required for the hardware functionality enabled by following the instructions above, this repository also includes a simple web-based user interface (WebUI) for similar control of mpd on the raspberry pi.  
+Although not required for the hardware functionality enabled by the instructions above, this repository also includes a simple web-based user interface (WebUI) for similar simple control of mpd on the raspberry pi.  
 
 The interface is written in php/html/css and just gives a play/pause toggle button and volume up/down control.  
 
