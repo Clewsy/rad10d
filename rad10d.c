@@ -104,7 +104,7 @@ void updateEncoderISR(int gpio, int level, uint32_t tick)
 //The gpioSetISRFunc requires ISRs such as this to receive gpio, level and tick.
 void toggleISR(int gpio, int level, uint32_t tick)
 {
-	if ((tick > (last_button_trigger + DEBOUNCE_US)) && (gpioRead(TOGGLE_PIN) == HIGH))
+	if (((tick - last_button_trigger) >  DEBOUNCE_US) && (gpioRead(TOGGLE_PIN) == HIGH))
 	{
 		if (block_toggle)	{block_toggle = FALSE;}		//Ignore the toggle if the button was used to send a stop signal.
 		else			{toggle_signal = TRUE;}		//Flag toggle with a normal press.
@@ -125,7 +125,7 @@ bool toggle_long_press(void)
 			toggle_button_held = TRUE;					//Set the flag so that the next iteration doesn't reset the timer.
 		}
 
-		if (gpioTick() > (time_when_pressed + TOGGLE_BUTTON_LONG_PRESS))	//If the button is held for duration exceeding TOGGLE_BUTTON_LONG_PRESS
+		if ((gpioTick() - (time_when_pressed) > TOGGLE_BUTTON_LONG_PRESS))	//If the button is held for duration exceeding TOGGLE_BUTTON_LONG_PRESS
 		{
 			block_toggle = TRUE;						//Set the stop flag (so button ISR ignores when the button is released).
 			return(TRUE);							//Return true: button long press true.
