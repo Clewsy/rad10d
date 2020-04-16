@@ -104,7 +104,7 @@ void updateEncoderISR(int gpio, int level, uint32_t tick)
 //The gpioSetISRFunc requires ISRs such as this to receive gpio, level and tick.
 void toggleISR(int gpio, int level, uint32_t tick)
 {
-	if (((tick - last_button_trigger) >  DEBOUNCE_US) && (gpioRead(TOGGLE_PIN) == HIGH))
+	if (((tick - last_button_trigger) > DEBOUNCE_US) && (gpioRead(TOGGLE_PIN) == HIGH))
 	{
 		if (block_toggle)	{block_toggle = FALSE;}		//Ignore the toggle if the button was used to send a stop signal.
 		else			{toggle_signal = TRUE;}		//Flag toggle with a normal press.
