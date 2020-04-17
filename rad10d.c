@@ -196,7 +196,6 @@ int main(int argc, char* argv[])
 		//If statement triggered if there is a desired volume change - i.e. the encoder has rotated.
 		if (the_encoder->volume_delta)
 		{
-			//Adjust the volume by an amount equal to the difference between the encoder value and the last encoder value.
 			mpd_run_change_volume(connection, the_encoder->volume_delta);	//Change the volume.
 			the_encoder->volume_delta = 0;					//Clear the desired volume delta.
 		}
