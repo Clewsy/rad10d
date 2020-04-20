@@ -18,6 +18,8 @@
 				<br />
 				<input type="submit" class="text_button" value="coderadio" name="coderadio" />
 				<br />
+				<input type="submit" class="text_button" value="proton" name="proton" />
+				<br />
 			</form>
 		</center>
 	</body>
@@ -38,9 +40,12 @@
 
 	// Preset buttons
 	if(isset($_GET['triplej'])) {
-		exec("/usr/bin/mpc clear && mpc add http://live-radio01.mediahubaustralia.com/2TJW/aac/ && mpc play");
+		exec("/usr/bin/mpc clear && /usr/bin/mpc add http://live-radio01.mediahubaustralia.com/2TJW/aac/ && /usr/bin/mpc play");
 	}
 	if(isset($_GET['coderadio'])) {
-		exec("/usr/bin/mpc clear && mpc add https://coderadio-admin.freecodecamp.org/radio/8010/radio.mp3 && mpc play");
+		exec("/usr/bin/mpc clear && /usr/bin/mpc add https://coderadio-admin.freecodecamp.org/radio/8010/radio.mp3 && /usr/bin/mpc play");
+	}
+	if(isset($_GET['proton'])) {
+		exec("/usr/bin/mpc clear && /usr/bin/mpc add http://www.protonradio.com:8000/schedule && /usr/bin/mpc play");
 	}
 ?>
