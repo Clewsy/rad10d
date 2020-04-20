@@ -10,6 +10,7 @@
 STREAM_ALIASES="\
 stream_triplej http://live-radio01.mediahubaustralia.com/2TJW/aac/
 stream_coderadio https://coderadio-relay.freecodecamp.org/radio/8010/radio.mp3
+stream_nightridefm https://nightride.fm/stream/nightride.m4a
 stream_proton http://www.protonradio.com:8000/schedule"
 
 while read -r STREAM

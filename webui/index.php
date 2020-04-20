@@ -14,11 +14,13 @@
 				<input type="image" class="small_button"  src="images/plus.png" name="vol_up_button" />
 				<br />
 				<h2>presets</h2>
-				<input type="submit" class="text_button" value="triplej" name="triplej" />
+				<input type="submit" class="text_button" value="triple_j" name="triple_j" />
 				<br />
 				<input type="submit" class="text_button" value="coderadio" name="coderadio" />
 				<br />
 				<input type="submit" class="text_button" value="proton" name="proton" />
+				<br />
+				<input type="submit" class="text_button" value="nightride_fm" name="nightride_fm" />
 				<br />
 			</form>
 		</center>
@@ -39,7 +41,7 @@
 	}
 
 	// Preset buttons
-	if(isset($_GET['triplej'])) {
+	if(isset($_GET['triple_j'])) {
 		exec("/usr/bin/mpc clear && /usr/bin/mpc add http://live-radio01.mediahubaustralia.com/2TJW/aac/ && /usr/bin/mpc play");
 	}
 	if(isset($_GET['coderadio'])) {
@@ -47,5 +49,8 @@
 	}
 	if(isset($_GET['proton'])) {
 		exec("/usr/bin/mpc clear && /usr/bin/mpc add http://www.protonradio.com:8000/schedule && /usr/bin/mpc play");
+	}
+	if(isset($_GET['nightride_fm'])) {
+		exec("/usr/bin/mpc clear && /usr/bin/mpc add https://nightride.fm/stream/nightride.m4a && /usr/bin/mpc play");
 	}
 ?>
