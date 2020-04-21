@@ -87,7 +87,7 @@ Some screenshots of the WebUI on an android smartphone:
 
 ![rad10 WebUI][image_rad10_webui_2]
 
-[link_clews_projects_rad10]:https://clews.pro/projects/rad10.html
+[link_clews_projects_rad10]:https://clews.pro/projects/rad10.php
 
 [link_web_libmpdclient_download]:https://musicpd.org/libs/libmpdclient/
 [link_web_apache]:https://httpd.apache.org/
