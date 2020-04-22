@@ -13,10 +13,16 @@ stream_coderadio https://coderadio-relay.freecodecamp.org/radio/8010/radio.mp3
 stream_nightridefm https://nightride.fm/stream/nightride.m4a
 stream_proton http://www.protonradio.com:8000/schedule"
 
+ALIASES_FILE="${HOME}/.bash_aliases"
+
 while read -r STREAM
 do
-	echo -e ${STREAM}
 	STREAM_NAME=$(echo ${STREAM} | cut -d ' ' -f 1)
 	STREAM_URL=$(echo ${STREAM} | cut -d ' ' -f 2)
-	echo -e "alias ${STREAM_NAME}=\"mpc clear && mpc add ${STREAM_URL} && mpc play\"" >> ~/.bash_aliases
+	if grep "${STREAM_NAME}" ${ALIASES_FILE} >> /dev/null; then
+		echo "Alias for \"${STREAM_NAME}\" already exists, skipping."
+	else
+		echo "Adding alias for \"${STREAM_NAME}\"."
+		echo -e "alias ${STREAM_NAME}=\"mpc clear && mpc add ${STREAM_URL} && mpc play\"" >> ${ALIASES_FILE}
+	fi
 done <<< ${STREAM_ALIASES}
