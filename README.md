@@ -46,7 +46,7 @@ Although not required for the hardware functionality enabled by the instructions
 
 The interface is written in php/html/css and just gives a play/pause toggle button and volume up/down control.  
 
-It also includes a couple of "presets" that I often use.  
+It also includes a few internet streaming "presets" that I often use.  Check out the [Icecast Directory][link_web_icecast_directory] to find urls for many streams.
 
 To install the WebUI, the raspberry pi will require installation of php and web server software such as [Apache][link_web_apache], [NGinX][link_web_nginx], [Lighttpd][link_web_lighttpd] or similar.  The following instructions will use Apache.
 
@@ -90,6 +90,7 @@ Some screenshots of the WebUI on an android smartphone:
 [link_clews_projects_rad10]:https://clews.pro/projects/rad10.php
 
 [link_web_libmpdclient_download]:https://musicpd.org/libs/libmpdclient/
+[link_web_icecast_directory]:https://dir.xiph.org/
 [link_web_apache]:https://httpd.apache.org/
 [link_web_nginx]:https://nginx.org/
 [link_web_lighttpd]:https://www.lighttpd.net/
