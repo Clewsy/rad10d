@@ -151,12 +151,14 @@ bool init_hardware(void)
 	return(TRUE);
 }
 
+
 //Triggered in the main loop by polling for a change in the encoder value.
 void update_volume(void)
 {
 	mpd_run_change_volume(connection, the_encoder->volume_delta);	//Change the volume.
 	the_encoder->volume_delta = 0;					//Clear the desired volume delta.
 }
+
 
 //Triggered in the main loop by polling the toggle flag being set (by ISR).
 void update_toggle(int current_status)

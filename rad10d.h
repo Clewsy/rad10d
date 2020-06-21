@@ -68,4 +68,6 @@ struct encoder *init_encoder(uint8_t channel_a, uint8_t channel_b);
 void volume_ISR(int32_t gpio, int32_t level, uint32_t tick);
 void toggle_ISR(int32_t gpio, int32_t level, uint32_t tick);
 bool toggle_long_press(void);
+void update_volume(void);
+void update_toggle(int current_status);
 bool init_hardware(void);
