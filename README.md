@@ -67,6 +67,7 @@ The web interface should now be available over your local network.  If the hostn
 
 ## Ansible role
 For another project ([clewsy_ansible][link_gitlab_clewsy_clewsy_ansible]) I have been automating deployment, configuration and maintenance of hosts on my home network.  In doing so, I created a couple of [ansible][link_web_ansible] roles that when run, will automatically install the dependencies, download this repo, compile/install the daemon and set up the WebUI.
+
 |Role							|Description																																					|
 |-------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 |[mpd][link_gitlab_clewsy_clewsy_ansible_roles_mpd]	|This role will install packages mpd, mpc and ncmpc, then configure and run the mpd daemon.																											|
