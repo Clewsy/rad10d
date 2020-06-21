@@ -1,9 +1,9 @@
 # rad10d
 A daemon written for an internet radio project using a raspberry pi.  The daemon interfaces with the mpd client api to allow **volume** and **play/pause** toggle control via a rotary encoder with push-button.  Rotating the encoder adjusts the volume, the push-button toggles play/pause.  Simple!  
 
-At least that's how it started.  Eventually I added the ability to **stop** by pressing and holding the toggle button for a couple of seconds.  This became useful for when I want to restart a track or if a live-stream drops out.
+At least that's how it started.  Eventually I added the ability to **stop** by pressing and holding the toggle button for a couple of seconds.  This became useful for when I want to restart a track or if a stream drops out.
 
-My hardware implementation includes a Raspberry Pi 3 with a small amplifier board connected to the 3.5mm audio jack.  The amplifier is set up with a mono output to a single speaker.  
+My hardware implementation includes a Raspberry Pi 3 with a small amplifier board connected to the 3.5mm audio jack.  The amplifier is set up with a mono output to a single speaker.  Initially I found (via dmesg) that the raspberry pi occassionally triggered an undervolt warning.  It never crashed, but with some experimenting I found the under-voltage would occassionaly be triggered at higher volumes when the amplifier drew higher currents.  I fixed this by switching to a 4amp  power supply capable of handling the peak loads.
 
 The rotary encoder channels A and B are connected to the Pi's GPIO pins 14 and 15 (Broadcom numbering) respectively (physical pins 8 & 10).  
 
@@ -65,6 +65,13 @@ $ sudo cp --recursive ~/rad10/webui/* .	## Change to suit wherever you cloned th
 ```
 The web interface should now be available over your local network.  If the hostname of your raspberry pi remains as the default, then the rad10 WebUI should be accessible from your browser at http://raspberrypi/
 
+## Ansible role
+For another project ([clewsy_ansible][link_gitlab_clewsy_clewsy_ansible]) I have been automating deployment, configuration and maintenance of hosts on my home network.  In doing so, I created a couple of [ansible][link_web_ansible] roles that when run, will automatically install the dependencies, download this repo, compile/install the daemon and set up the WebUI.
+|Role							|Description																																					|
+|-------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|[mpd][link_gitlab_clewsy_clewsy_ansible_roles_mpd]	|This role will install packages mpd, mpc and ncmpc, then configure and run the mpd daemon.																											|
+|[rad10][link_gitlab_clewsy_clewsy_ansible_roles_rad10]	|The mpd role is a pre-requisite for this role.  The rad10 role will first run the mpd role, then clone rad10d repo, compile the daemon and configure a unit-file for auto-starting.  It will then install web server packages ([Apache][link_web_apache]) and copy the html/php files for the rad10 webui.	|
+
 ## Credits
 A starting point for developing the rotary encoder interface daemon came from the [work done by Andrew Stine][link_web_andrew_stine].  
 
@@ -89,18 +96,23 @@ Some screenshots of the WebUI on an android smartphone:
 
 [link_clews_projects_rad10]:https://clews.pro/projects/rad10.php
 
-[link_web_libmpdclient_download]:https://musicpd.org/libs/libmpdclient/
-[link_web_icecast_directory]:https://dir.xiph.org/
-[link_web_apache]:https://httpd.apache.org/
-[link_web_nginx]:https://nginx.org/
-[link_web_lighttpd]:https://www.lighttpd.net/
+[link_gitlab_clewsy_clewsy_ansible]:https://gitlab.com/clewsy/clewsy_ansible
+[link_gitlab_clewsy_clewsy_ansible_roles_mpd]:https://gitlab.com/clewsy/clewsy_ansible/-/tree/master/roles/mpd
+[link_gitlab_clewsy_clewsy_ansible_roles_rad10]:https://gitlab.com/clewsy/clewsy_ansible/-/tree/master/roles/rad10
+
 [link_web_andrew_stine]:https://github.com/astine/rotaryencoder/blob/master/rotaryencoder.c
+[link_web_ansible]:https://docs.ansible.com/
+[link_web_apache]:https://httpd.apache.org/
+[link_web_icecast_directory]:https://dir.xiph.org/
+[link_web_libmpdclient_download]:https://musicpd.org/libs/libmpdclient/
 [link_web_libmpdclient_library]:https://www.musicpd.org/doc/libmpdclient/index.html
+[link_web_lighttpd]:https://www.lighttpd.net/
+[link_web_nginx]:https://nginx.org/
+[link_web_pigpio]:http://abyz.me.uk/rpi/pigpio/index.html
 [link_web_wiringpi]:http://wiringpi.com/
 [link_web_wiringpi_deprecated]:http://wiringpi.com/wiringpi-deprecated/
-[link_web_pigpio]:http://abyz.me.uk/rpi/pigpio/index.html
 
-[image_rad10_front]:/images/rad10_front.jpg
 [image_rad10_back]:/images/rad10_back.jpg
+[image_rad10_front]:/images/rad10_front.jpg
 [image_rad10_webui_1]:/images/rad10_webui_1.png
 [image_rad10_webui_2]:/images/rad10_webui_2.png

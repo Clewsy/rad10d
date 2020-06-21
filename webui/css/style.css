@@ -6,17 +6,18 @@ body {
 	font-weight: bold;
 }
 
-h1 {
+/*Headings*/
+h1 {	/* rad10 */
 	font-size: 96px;
 	margin: 0px 0px 30px 0px;
 }
-
-h2 {
+h2 {	/* presets, status */
 	font-size: 48px;
 	margin: 60px 0px 0px 0px;
 }
 
-input.text_button {
+/*Buttons*/
+.text_button {	/* preset buttons */
 	font-size: 24px;
 	font-weight: bold;
 	text-align: center;
@@ -30,17 +31,31 @@ input.text_button {
 	border-style: solid;
 	border-width: 8px;
 }
-
-input.large_button {
+.large_button {	/* toggle (play/pause) button */
 	height: 300px;
 	width: 300px;
 }
-input.small_button {
+.small_button {	/* volume buttons and refresh button */
 	height: 100px;
 	width: 100px;
 }
-
-input:active {
+input:active {	/* Invert colours while clicked */
 	background-color: black;
 	color: rgb(150,150,150);
 }
+
+/*Status Box*/
+#status_box {
+	font-size: 18px;
+	background-color: black;
+	color: rgb(150,150,150);
+	max-width: 1000px;
+	border-radius: 20px;
+	border-color: rgb(150,150,150);
+	border-style: solid;
+	border-width: 8px;
+}
+#status_box td	{ padding: 5px; }
+#playing	{ text-align: center; }
+#status		{ text-align: left; }
+#volume		{ text-align: right; }
