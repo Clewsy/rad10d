@@ -136,22 +136,6 @@ bool toggle_long_press(void)
 }
 
 
-//Initialise the hardware inputs - two channels on the rotary encoder and a push-button.
-bool init_hardware(void)
-{
-	if (gpioInitialise() == PI_INIT_FAILED) {return(FALSE);}				//Initialise gpio pins on raspi, return false if failure.
-
-	if (gpioSetMode(TOGGLE_PIN, PI_INPUT) != 0) {return(FALSE);}				//Set as input the pin to which the toggle button is connected.
-	if (gpioSetPullUpDown(TOGGLE_PIN, PI_PUD_UP) != 0) {return(FALSE);}			//Enable internal pull-up resistor on the toggle pin.
-	if (gpioSetISRFunc(TOGGLE_PIN, RISING_EDGE, 0, &toggle_ISR) != 0) {return(FALSE);}	//Set up interrupt on the toggle button.
-
-	the_encoder = init_encoder(VOL_ENCODER_A_PIN, VOL_ENCODER_B_PIN);			//Initialise values stored in global struct "the_encoder".
-	if (the_encoder == NULL) {return(FALSE);}						//Return false if initialisation fails.
-
-	return(TRUE);
-}
-
-
 //Triggered in the main loop by polling for a change in the encoder value.
 void update_volume(void)
 {
@@ -166,6 +150,22 @@ void update_toggle(int current_status)
 	if (current_status == MPD_STATE_PLAY)	{mpd_run_pause(connection, TRUE);}	//Currently playing, so pause.
 	else					{mpd_run_play(connection);}		//Currently paused or stopped, so play.
 	toggle_signal = FALSE;
+}
+
+
+//Initialise the hardware inputs - two channels on the rotary encoder and a push-button.
+bool init_hardware(void)
+{
+	if (gpioInitialise() == PI_INIT_FAILED) {return(FALSE);}				//Initialise gpio pins on raspi, return false if failure.
+
+	if (gpioSetMode(TOGGLE_PIN, PI_INPUT) != 0) {return(FALSE);}				//Set as input the pin to which the toggle button is connected.
+	if (gpioSetPullUpDown(TOGGLE_PIN, PI_PUD_UP) != 0) {return(FALSE);}			//Enable internal pull-up resistor on the toggle pin.
+	if (gpioSetISRFunc(TOGGLE_PIN, RISING_EDGE, 0, &toggle_ISR) != 0) {return(FALSE);}	//Set up interrupt on the toggle button.
+
+	the_encoder = init_encoder(VOL_ENCODER_A_PIN, VOL_ENCODER_B_PIN);			//Initialise values stored in global struct "the_encoder".
+	if (the_encoder == NULL) {return(FALSE);}						//Return false if initialisation fails.
+
+	return(TRUE);
 }
 
 
