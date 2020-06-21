@@ -151,6 +151,21 @@ bool init_hardware(void)
 	return(TRUE);
 }
 
+//Triggered in the main loop by polling for a change in the encoder value.
+void update_volume(void)
+{
+	mpd_run_change_volume(connection, the_encoder->volume_delta);	//Change the volume.
+	the_encoder->volume_delta = 0;					//Clear the desired volume delta.
+}
+
+//Triggered in the main loop by polling the toggle flag being set (by ISR).
+void update_toggle(int current_status)
+{
+	if (current_status == MPD_STATE_PLAY)	{mpd_run_pause(connection, TRUE);}	//Currently playing, so pause.
+	else					{mpd_run_play(connection);}		//Currently paused or stopped, so play.
+	toggle_signal = FALSE;
+}
+
 
 //Main program loop.  arguments (argv[]) and number of arguments (argc) ignored.
 int main(int argc, char* argv[])
@@ -190,34 +205,14 @@ int main(int argc, char* argv[])
 	//The main infinite loop.
 	while (TRUE)
 	{
+		mpd_connection_clear_error(connection);	//Attempt to clear any error that may arise.
+
 		gpioDelay(IDLE_DELAY);			//A delay so as to not max out cpu usage when running the main loop.
 		current_status = get_mpd_status();	//Regularly checking mpd status prevents the connection being dropped. 
 
-		//If statement triggered if there is a desired volume change - i.e. the encoder has rotated.
-		if (the_encoder->volume_delta)
-		{
-			mpd_run_change_volume(connection, the_encoder->volume_delta);	//Change the volume.
-			the_encoder->volume_delta = 0;					//Clear the desired volume delta.
-		}
-
-		//If the toggle button has been held for an extended duration, send the stop command to mpd.
-		if (toggle_long_press()) {mpd_run_stop(connection);}
-
-		//If statement to poll the state of the toggle_signal flag.  A set flag indicates button has been pressed to request play/pause toggle.
-		if (toggle_signal)
-		{
-			if (current_status == MPD_STATE_PLAY)	{mpd_run_pause(connection, TRUE);}	//Currently playing, so pause.
-			else					{mpd_run_play(connection);}		//Currently paused or stopped, so play.
-
-			toggle_signal = FALSE;
-		}
-
-		//Check for (and try to recover from) connection errors.
-		if (mpd_connection_get_error(connection) != MPD_ERROR_SUCCESS)	//If an error event has occurred.
-		{
-			mpd_connection_clear_error(connection);			//Attempt to clear any error that may arise.
-			while (mpd_reconnect() == FALSE) {}			//Attempt to re-establish an mpd connection.
-		}
+		if (the_encoder->volume_delta)	{update_volume();}			//Poll for a change in the encoder value.  If so, run update_volume().
+		if (toggle_long_press())	{mpd_run_stop(connection);}		//Poll for a long hold of the button.  If so, send the stop command.
+		if (toggle_signal)		{update_toggle(current_status);}	//Poll the state of the toggle_signal flag.  If set, run update_toggle().
 	}
 
 	return(-1);	//Never reached.
