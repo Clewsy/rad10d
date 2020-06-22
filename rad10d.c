@@ -145,9 +145,9 @@ void update_volume(void)
 
 
 //Triggered in the main loop by polling the toggle flag being set (by ISR).
-void update_toggle(int current_status)
-{
-	if (current_status == MPD_STATE_PLAY)	{mpd_run_pause(connection, TRUE);}	//Currently playing, so pause.
+void update_toggle(void)
+{	
+	if (get_mpd_status() == MPD_STATE_PLAY)	{mpd_run_pause(connection, TRUE);}	//Currently playing, so pause.
 	else					{mpd_run_play(connection);}		//Currently paused or stopped, so play.
 	toggle_signal = FALSE;
 }
@@ -202,19 +202,16 @@ int main(int argc, char* argv[])
 	if (init_hardware() != TRUE) {exit(EXIT_FAILURE);}	//Initialise the hardware (encoder and push button).
 	if (init_mpd() != TRUE) {exit(EXIT_FAILURE);}		//Initialise mpd connection.
 
-	int current_status;		//Initialise integer to indicate current mpd playing status.
 
 	//The main infinite loop.
 	while (TRUE)
 	{
-		mpd_connection_clear_error(connection);	//Attempt to clear any error that may arise.
+		get_mpd_status();						//Loop until valid connection state. Keeps the connection alive.
+		gpioDelay(IDLE_DELAY);						//A delay so as to not max out cpu usage when running the main loop.
 
-		gpioDelay(IDLE_DELAY);			//A delay so as to not max out cpu usage when running the main loop.
-		current_status = get_mpd_status();	//Regularly checking mpd status prevents the connection being dropped. 
-
-		if (the_encoder->volume_delta)	{update_volume();}			//Poll for a change in the encoder value.  If so, run update_volume().
-		if (toggle_long_press())	{mpd_run_stop(connection);}		//Poll for a long hold of the button.  If so, send the stop command.
-		if (toggle_signal)		{update_toggle(current_status);}	//Poll the state of the toggle_signal flag.  If set, run update_toggle().
+		if (the_encoder->volume_delta)	{update_volume();}		//Poll for a change in the encoder value.  If so, run update_volume().
+		if (toggle_signal)		{update_toggle();}		//Poll the state of the toggle_signal flag.  If set, run update_toggle().
+		if (toggle_long_press())	{mpd_run_stop(connection);}	//Poll for a long hold of the button.  If so, send the stop command.
 	}
 
 	return(-1);	//Never reached.

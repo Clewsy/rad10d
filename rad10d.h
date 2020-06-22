@@ -69,5 +69,5 @@ void volume_ISR(int32_t gpio, int32_t level, uint32_t tick);
 void toggle_ISR(int32_t gpio, int32_t level, uint32_t tick);
 bool toggle_long_press(void);
 void update_volume(void);
-void update_toggle(int current_status);
+void update_toggle(void);
 bool init_hardware(void);
