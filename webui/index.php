@@ -24,10 +24,10 @@
 		exec("/usr/bin/mpc clear && /usr/bin/mpc add http://www.protonradio.com:8000/schedule && /usr/bin/mpc play");
 	}
 	if(isset($_GET['nightride_fm'])) {
-		exec("/usr/bin/mpc clear && /usr/bin/mpc add https://nightride.fm/stream/nightride.m4a && /usr/bin/mpc play");
+		exec("/usr/bin/mpc clear && /usr/bin/mpc add https://stream.nightride.fm/nightride.m4a && /usr/bin/mpc play");
 	}
 	if(isset($_GET['rekt_fm'])) {
-		exec("/usr/bin/mpc clear && /usr/bin/mpc add https://rekt.fm/stream/rekt.m4a && /usr/bin/mpc play");
+		exec("/usr/bin/mpc clear && /usr/bin/mpc add https://stream.nightride.fm/rekt.m4a && /usr/bin/mpc play");
 	}
 
 	// Update status
