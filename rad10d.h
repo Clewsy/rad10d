@@ -46,7 +46,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Global declarations.
 
-struct mpd_connection *connection = NULL;	//Initialise globally accessible structure contatining mpd connection info (refer "mpd/client.h").
+struct mpd_connection *connection = NULL;	//Initialise globally accessible structure containing mpd connection info (refer "mpd/client.h").
 
 //Define the structure that represents data from the encoder.
 struct encoder
