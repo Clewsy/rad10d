@@ -18,7 +18,7 @@ TARGET = rad10d
 CC = gcc
 
 all:
-	$(CC) $(CFLAGS) $(LDLIBS) $(TARGET).c -o $(TARGET)
+	$(CC) $(CFLAGS) $(TARGET).c $(LDLIBS) -o $(TARGET)
 
 #Executing "make clean" will carry out the following.
 clean:
