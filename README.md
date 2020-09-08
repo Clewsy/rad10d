@@ -1,5 +1,5 @@
 # rad10d
-A daemon written for an internet radio project using a raspberry pi.  The daemon interfaces with the mpd client api to allow **volume** and **play/pause** toggle control via a rotary encoder with push-button.  Rotating the encoder adjusts the volume, the push-button toggles play/pause.  Simple!  
+A daemon written for an internet radio project using a raspberry pi.  The daemon interfaces with the [mpd][link_web_mpd] client api to allow **volume** and **play/pause** toggle control via a rotary encoder with push-button.  Rotating the encoder adjusts the volume, the push-button toggles play/pause.  Simple!  
 
 At least that's how it started.  Eventually I added the ability to **stop** by pressing and holding the toggle button for a couple of seconds.  This became useful for when I want to restart a track or if a stream drops out.
 
@@ -21,7 +21,7 @@ $ sudo apt install pigpio mpd mpc libmpdclient-dev
 ```
 Notes:
 * Instead of using the package manager to install the mpdclient library (libmpdclient-dev), you can obtain it directly from the [libmpdclient download page][link_web_libmpdclient_download].
-* You don't neccessarily need to install mpc for this project, but it's a great tool for controlling mpd from the command line and also useful for debugging.  It is however required if you wish to use the WebUI.
+* You don't neccessarily need to install [mpc][link_web_mpc] for this project, but it's a great tool for controlling mpd from the command line and also useful for debugging.  It is however required if you wish to use the WebUI.
 
 Clone this repo, compile the executable (**rad10d**) and install:
 ```shell
@@ -113,6 +113,8 @@ Some screenshots of the WebUI on an android smartphone:
 [link_web_libmpdclient_download]:https://musicpd.org/libs/libmpdclient/
 [link_web_libmpdclient_library]:https://www.musicpd.org/doc/libmpdclient/index.html
 [link_web_lighttpd]:https://www.lighttpd.net/
+[link_web_mpc]:https://musicpd.org/clients/mpc/
+[link_web_mpd]:https://musicpd.org/
 [link_web_nginx]:https://nginx.org/
 [link_web_pigpio]:http://abyz.me.uk/rpi/pigpio/index.html
 [link_web_wiringpi]:http://wiringpi.com/
