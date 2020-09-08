@@ -21,7 +21,6 @@ $ sudo apt install pigpio mpd mpc libmpdclient-dev
 ```
 Notes:
 * Instead of using the package manager to install the mpdclient library (libmpdclient-dev), you can obtain it directly from the [libmpdclient download page][link_web_libmpdclient_download].
-$ make all
 * You don't neccessarily need to install mpc for this project, but it's a great tool for controlling mpd from the command line and also useful for debugging.  It is however required if you wish to use the WebUI.
 
 Clone this repo, compile the executable (**rad10d**) and install:
@@ -31,10 +30,11 @@ $ cd rad10d
 $ sudo make install
 ```
 The `sudo make install` command performs the following actions:
-1. Copies the compiled executable to `/usr/local/sbin/rad10`.  Ownership is set to root and permissions mode set to 0755.
-2. Copies the systemd unit file to `/lib/systemd/system/rad10d.service`.  Ownership is set to root and permissions mode set to 0755.
-3. Enables the systemd service so that the daemon is executed at boot.
-4. Starts the sytemd service which in turn starts the rad10 daemon.
+1. Compile the rad10d executable file.
+2. Copies the compiled executable to `/usr/local/sbin/rad10`.  Ownership is set to root and permissions mode set to 0755.
+3. Copies the systemd unit file to `/lib/systemd/system/rad10d.service`.  Ownership is set to root and permissions mode set to 0755.
+4. Enables the systemd service so that the daemon is executed at boot.
+5. Starts the sytemd service which in turn starts the rad10 daemon.
 
 Instead of running `sudo make install`, these installation tasks could be completed manually with the following commands:
 ```shell
