@@ -1,5 +1,5 @@
 [Unit]
-Description=rad10d - daemon service to facillitate hardware media (mpd) control.
+Description=rad10d - daemon service to facillitate hardware control of mpd.
 
 [Service]
 Type=forking

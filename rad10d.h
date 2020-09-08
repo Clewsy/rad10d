@@ -19,11 +19,11 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Hardware definitions.  Pinout numbering for use with the pigpio is the same as the Broadcom chip numbering (note, != wiringPi numbering).
-#define VOL_ENCODER_A_PIN		14	//Encoder channel A.
-#define VOL_ENCODER_B_PIN		15	//Encoder channel B.
-#define BUTTON_PIN			18	//Play/pause toggle button.
-#define LOW				0	//Pin grounded (e.g. button pressed).
-#define HIGH				1	//Pin pulled high.
+#define VOL_ENCODER_A_PIN	14	//Encoder channel A.
+#define VOL_ENCODER_B_PIN	15	//Encoder channel B.
+#define BUTTON_PIN		18	//Play/pause toggle button.
+#define LOW			0	//Pin grounded (e.g. button pressed).
+#define HIGH			1	//Pin pulled high.
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Timer duration definitions.
@@ -32,9 +32,9 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //mpd control definitions.
-#define SIGNAL_NULL			0	//mpd control signal set by the push-button.  SIGNAL_NULL:	No command.
-#define SIGNAL_TOGGLE			1	//mpd control signal set by the push-button.  SIGNAL_TOGGLE:	Send the toggle command.
-#define SIGNAL_STOP			2	//mpd control signal set by the push-button.  SIGNAL_STOP:	Send the stop command.
+#define SIGNAL_NULL	0	//mpd control signal set by the push-button.  SIGNAL_NULL:	No command.
+#define SIGNAL_TOGGLE	1	//mpd control signal set by the push-button.  SIGNAL_TOGGLE:	Send the toggle command.
+#define SIGNAL_STOP	2	//mpd control signal set by the push-button.  SIGNAL_STOP:	Send the stop command.
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //mpd connection definitions.
@@ -44,9 +44,7 @@
 #define IDLE_DELAY	10000		//Delay within the main loop to reduce cpu load (in microseconds).
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Global declarations.
-
-struct mpd_connection *connection = NULL;	//Initialise globally accessible structure containing mpd connection info (refer "mpd/client.h").
+//Type definitions.
 
 //Define the structure that represents data from the encoder.
 struct encoder
@@ -62,7 +60,6 @@ struct encoder
 	volatile uint8_t button_signal;		//mpd control signal set by the push button.  SIGNAL_NULL, SIGNAL_TOGGLE or SIGNAL_STOP.
 };
 
-struct encoder *the_encoder;			//Declare structure named the_encoder - gloablly accessible (used in ISR).
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

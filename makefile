@@ -14,7 +14,7 @@ LDLIBS = -lpigpio -lmpdclient
 #The target executable file name
 TARGET = rad10d
 
-# The compiler; typically gcc for c and g++ for c++
+#The compiler; typically gcc for c and gpp for c++
 CC = gcc
 
 all:
@@ -22,4 +22,30 @@ all:
 
 #Executing "make clean" will carry out the following.
 clean:
-	rm -f $(TARGET) *.o
+	rm --force $(TARGET) *.o
+
+
+#Installation destinations.
+INSTALL_DEST_BIN = /usr/local/sbin/$(TARGET)
+INSTALL_DEST_SERVICE = /lib/systemd/system/$(TARGET).service
+
+#Executing "make install" will carry out the following.
+install: all
+ifneq ($(shell id -u), 0)
+	@echo Must be run as root.  Try: sudo make install
+else
+	install --mode=0755 --owner=root --group=root $(TARGET) $(INSTALL_DEST_BIN)
+	install --mode=0755 --owner=root --group=root $(TARGET).service $(INSTALL_DEST_SERVICE)
+	systemctl enable $(TARGET).service
+	systemctl start $(TARGET).service
+endif
+
+uninstall:
+ifneq ($(shell id -u), 0)
+	@echo Must be run as root.  Try: sudo make install
+else
+	systemctl disable $(TARGET).service
+	systemctl stop $(TARGET).service
+	rm --force $(INSTALL_DEST_BIN)
+	rm --force $(INSTALL_DEST_SERVICE)
+endif

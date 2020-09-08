@@ -1,7 +1,11 @@
 // rad10d.c - rad10d c code file
-// For project details visit https://clews.pro/projects/rad10.html and https://gitlab.com/clewsy/rad10d
+// For project details visit https://clews.pro/projects/rad10.php and https://gitlab.com/clewsy/rad10d
 
 #include "rad10d.h"
+
+//Global declarations.
+struct encoder *the_encoder;			//Declare structure named the_encoder - gloablly accessible (used in ISR).
+struct mpd_connection *connection = NULL;	//Initialise globally accessible structure containing mpd connection info (refer "mpd/client.h").
 
 
 //Create an mpd "connection" structure and return the address of the struct for use.
@@ -126,8 +130,6 @@ void button_ISR(int32_t gpio, int32_t level, uint32_t time)
 
 		the_encoder->button_released_time = time;	//Reset the de-bounce timestamp.
 	}
-
-
 }
 
 
@@ -165,7 +167,6 @@ void update_mpd_state(volatile uint8_t *signal_address)
 			mpd_run_stop(connection);	//Send the stop command.
 			break;				//Do not reset signal, used as a check in the button ISR.
 	}
-
 }
 
 

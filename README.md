@@ -21,25 +21,30 @@ $ sudo apt install pigpio mpd mpc libmpdclient-dev
 ```
 Notes:
 * Instead of using the package manager to install the mpdclient library (libmpdclient-dev), you can obtain it directly from the [libmpdclient download page][link_web_libmpdclient_download].
-* You don't neccessarily need to install mpc for this project, but it's a great tool for controlling mpd from the command line and also useful for debugging.  It is required however if you wish to use the WebUI.
+$ make all
+* You don't neccessarily need to install mpc for this project, but it's a great tool for controlling mpd from the command line and also useful for debugging.  It is however required if you wish to use the WebUI.
 
-Clone this repo and compile the executable **rad10d**:
+Clone this repo, compile the executable (**rad10d**) and install:
 ```shell
 $ git clone https://gitlab.com/clewsy/rad10d
 $ cd rad10d
-$ make all
+$ sudo make install
 ```
-Copy files to system directories:
+The `sudo make install` command performs the following actions:
+1. Copies the compiled executable to `/usr/local/sbin/rad10`.  Ownership is set to root and permissions mode set to 0755.
+2. Copies the systemd unit file to `/lib/systemd/system/rad10d.service`.  Ownership is set to root and permissions mode set to 0755.
+3. Enables the systemd service so that the daemon is executed at boot.
+4. Starts the sytemd service which in turn starts the rad10 daemon.
+
+Instead of running `sudo make install`, these installation tasks could be completed manually with the following commands:
 ```shell
 $ sudo cp rad10d /usr/local/sbin/rad10d
 $ sudo cp rad10d.service /lib/systemd/system/rad10d.service
-```
-Enable and start the service:  
-(This service is created so that the daemon runs at boot).
-```shell
 $ sudo systemctl enable rad10d.service
 $ sudo systemctl start rad10d.service
 ```
+
+Note, the daemon can be uninstalled with `sudo make uninstall` which will reverse the installation procedure.
 
 ## WebUI
 Although not required for the hardware functionality enabled by the instructions above, this repository also includes a simple web-based user interface (WebUI) for similar simple control of mpd on the raspberry pi.  
@@ -70,7 +75,7 @@ For another project ([clewsy_ansible][link_gitlab_clewsy_clewsy_ansible]) I have
 
 |Role							|Description																																					|
 |-------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|[mpd][link_gitlab_clewsy_clewsy_ansible_roles_mpd]	|This role will install packages mpd, mpc and ncmpc, then configure and run the mpd daemon.																											|
+|[mpd][link_gitlab_clewsy_clewsy_ansible_roles_mpd]	|This role will install packages mpd, mpc and ncmpc, then configure and run the mpd daemon.  It also creates some handy aliases.																										|
 |[rad10][link_gitlab_clewsy_clewsy_ansible_roles_rad10]	|The mpd role is a pre-requisite for this role.  The rad10 role will first run the mpd role, then clone rad10d repo, compile the daemon and configure a unit-file for auto-starting.  It will then install web server packages ([Apache][link_web_apache]) and copy the html/php files for the rad10 webui.	|
 
 ## Credits
