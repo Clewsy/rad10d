@@ -14,7 +14,7 @@ LDLIBS = -lpigpio -lmpdclient
 #The target executable file name
 TARGET = rad10d
 
-#The compiler; typically gcc for c and gpp for c++
+#The compiler; typically gcc for c and g++ for c++
 CC = gcc
 
 all:
