@@ -40,6 +40,7 @@ else
 	systemctl start $(TARGET).service
 endif
 
+#Executing "make uninstall" will carry out the following.
 uninstall:
 ifneq ($(shell id -u), 0)
 	@echo Must be run as root.  Try: sudo make install
