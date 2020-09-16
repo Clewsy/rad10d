@@ -1,9 +1,9 @@
 # rad10d
-A daemon written for an internet radio project using a raspberry pi.  The daemon interfaces with the [mpd][link_web_mpd] client api to allow **volume** and **play/pause** toggle control via a rotary encoder with push-button.  Rotating the encoder adjusts the volume, the push-button toggles play/pause.  Simple!  
+A daemon written for an internet radio project using a [Raspberry Pi][link_web_raspberry_pi].  The daemon interfaces with the [mpd][link_web_mpd] client api to allow **volume** and **play/pause** toggle control via a rotary encoder with ia push-button.  Rotating the encoder adjusts the volume, the push-button toggles play/pause.  Simple!
 
 At least that's how it started.  Eventually I added the ability to **stop** by pressing and holding the toggle button for a couple of seconds.  This became useful for when I want to restart a track or if a stream drops out.
 
-My hardware implementation includes a Raspberry Pi 3 with a small amplifier board connected to the 3.5mm audio jack.  The amplifier is set up with a mono output to a single speaker.  Initially I found (via dmesg) that the raspberry pi occassionally triggered an undervolt warning.  It never crashed, but with some experimenting I found the under-voltage would occassionaly be triggered at higher volumes when the amplifier drew higher currents.  I fixed this by switching to a 4amp  power supply capable of handling the peak loads.
+My hardware implementation includes a Raspberry Pi 4 with a small amplifier board connected to the 3.5mm audio jack.  The amplifier is set up with a mono output to a single speaker.  Initially I found (via dmesg) that the raspberry pi occassionally triggered an undervolt warning.  It never crashed, but with some experimenting I found the under-voltage would occassionaly be triggered at higher volumes when the amplifier drew higher currents.  I fixed this by switching to a 4amp  power supply capable of handling the peak loads.
 
 The rotary encoder channels A and B are connected to the Pi's GPIO pins 14 and 15 (Broadcom numbering) respectively (physical pins 8 & 10).  
 
@@ -117,6 +117,7 @@ Some screenshots of the WebUI on an android smartphone:
 [link_web_mpd]:https://musicpd.org/
 [link_web_nginx]:https://nginx.org/
 [link_web_pigpio]:http://abyz.me.uk/rpi/pigpio/index.html
+[link_web_raspberry_pi]:https://www.raspberrypi.org/
 [link_web_wiringpi]:http://wiringpi.com/
 [link_web_wiringpi_deprecated]:http://wiringpi.com/wiringpi-deprecated/
 
