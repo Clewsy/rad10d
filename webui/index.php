@@ -15,7 +15,7 @@
 	
 	// Preset buttons
 	if(isset($_GET['triple_j'])) {
-		exec("/usr/bin/mpc clear && /usr/bin/mpc add http://www.abc.net.au/res/streaming/audio/mp3/triplej.pls && /usr/bin/mpc play");
+		exec("/usr/bin/mpc clear && /usr/bin/mpc add http://live-radio01.mediahubaustralia.com/2TJW/mp3/ && /usr/bin/mpc play");
 	}
 	if(isset($_GET['coderadio'])) {
 		exec("/usr/bin/mpc clear && /usr/bin/mpc add https://coderadio-admin.freecodecamp.org/radio/8010/radio.mp3 && /usr/bin/mpc play");
