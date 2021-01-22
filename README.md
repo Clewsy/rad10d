@@ -31,10 +31,10 @@ $ sudo make install
 ```
 The `sudo make install` command performs the following actions:
 1. Compile the rad10d executable file.
-2. Copies the compiled executable to `/usr/local/sbin/rad10`.  Ownership is set to root and permissions mode set to 0755.
+2. Copies the compiled executable to `/usr/local/sbin/rad10d`.  Ownership is set to root and permissions mode set to 0755.
 3. Copies the systemd unit file to `/lib/systemd/system/rad10d.service`.  Ownership is set to root and permissions mode set to 0755.
 4. Enables the systemd service so that the daemon is executed at boot.
-5. Starts the sytemd service which in turn starts the rad10 daemon.
+5. Starts the sytemd service which in turn starts the rad10d daemon.
 
 Instead of running `sudo make install`, these installation tasks could be completed manually with the following commands:
 ```shell
