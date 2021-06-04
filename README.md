@@ -1,7 +1,7 @@
 # rad10d
 A daemon written for an internet radio project using a [Raspberry Pi][link_web_raspberry_pi].  The daemon interfaces with [mpd][link_web_mpd] (thanks to the [libmpdclient][link_web_libmpdclient_library] library) to provide **volume** and **play/pause** toggle control via a rotary encoder with a push-button.  Rotating the encoder adjusts the volume, the push-button toggles play/pause.  Simple!
 
-At least that's how it started.  Eventually I later added the ability to **stop** by pressing and holding the toggle button for a couple of seconds.  This became useful for when I want to restart a track or if a stream drops out.
+At least that's how it started.  I later added the ability to **stop** by pressing and holding the toggle button for a couple of seconds.  This became useful for when I want to restart a track or if a stream drops out.
 
 My hardware implementation includes a Raspberry Pi 4 with a small amplifier board connected to the 3.5mm audio jack.  The amplifier is set up with a mono output to a single speaker.  Initially I found (via dmesg) that the raspberry pi occassionally triggered an undervolt warning.  It never crashed, but with some experimenting I found the under-voltage would occassionaly be triggered at higher volumes when the amplifier drew higher currents.  I fixed this by switching to a 4amp  power supply capable of handling the peak loads.
 
