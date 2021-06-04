@@ -24,7 +24,6 @@ all:
 clean:
 	rm --force $(TARGET) *.o
 
-
 #Installation destinations.
 INSTALL_DEST_BIN = /usr/local/sbin/$(TARGET)
 INSTALL_DEST_SERVICE = /lib/systemd/system/$(TARGET).service
@@ -43,7 +42,7 @@ endif
 #Executing "make uninstall" will carry out the following.
 uninstall:
 ifneq ($(shell id -u), 0)
-	@echo Must be run as root.  Try: sudo make install
+	@echo Must be run as root.  Try: sudo make uninstall
 else
 	systemctl disable $(TARGET).service
 	systemctl stop $(TARGET).service
