@@ -1,11 +1,12 @@
-// rad10d.c - rad10d c code file
-// For project details visit https://clews.pro/projects/rad10.php and https://gitlab.com/clewsy/rad10d
+//rad10d.c - rad10d c code file
+//For project details visit https://clews.pro/projects/rad10.php and https://gitlab.com/clewsy/rad10d
+//For info regarding the mpd c library (libmpdclient), visit https://www.musicpd.org/libs/libmpdclient/.
 
 #include "rad10d.h"
 
 //Global declarations.
 struct encoder *the_encoder;			//Declare structure named the_encoder - gloablly accessible (used in ISR).
-struct mpd_connection *connection = NULL;	//Initialise globally accessible structure containing mpd connection info (refer "mpd/client.h").
+struct mpd_connection *connection = NULL;	//Initialise globally accessible structure containing mpd connection.
 
 
 //Create an mpd "connection" structure and return the address of the struct for use.
@@ -13,8 +14,9 @@ static struct mpd_connection *setup_connection(void)
 {
 	struct mpd_connection *conn;					//Initialise the struct.
 
-	conn = mpd_connection_new(MPD_SERVER, MPD_PORT, MPD_TIMEOUT);	//Settings include mpd server IP address, port # and connection timeout (ms).
+	conn = mpd_connection_new(MPD_SERVER, MPD_PORT, MPD_TIMEOUT);	//Define mpd server IP, port # and connection timeout (ms).
 	if (conn == NULL) exit(EXIT_FAILURE);				//Exit on failure to initialise mpd connection.
+
 	return(conn);							//Return the address of the connection struct.
 }
 
@@ -22,18 +24,18 @@ static struct mpd_connection *setup_connection(void)
 //Initialise the mpd connection.
 bool init_mpd(void)
 {
-	connection = setup_connection();			//Initialise mpd connection session.
-	if(connection == NULL) return(FALSE);			//Confirm "connection" was successfully set up.  If not, return false.
-	mpd_connection_set_keepalive(connection, TRUE);		//Enable TCP keepalives to prevent disconnection in the event of a long idle duration.
+	connection = setup_connection();		//Initialise mpd connection session.
+	if(connection == NULL) return(FALSE);		//Confirm "connection" was successfully set up.  If not, return false.
+	mpd_connection_set_keepalive(connection, TRUE);	//Enable TCP keepalives to prevent idle disconnection.
 
-	return(TRUE);						//Apparently connection has been successfully set up so return true.
+	return(TRUE);					//Apparently connection has been successfully established so return true.
 }
 
 
 //Attempt to close then restablish an mpd connection.
 bool mpd_reconnect(void)
 {
-	mpd_connection_free(connection);	//Attempt to close the mpd connection and free the memory.
+	mpd_connection_free(connection);	//Close the mpd connection and free the memory.
 	if (init_mpd() == FALSE) return(FALSE);	//Attempt to re-initialise a new (identical) mpd connection.
 
 	return(TRUE);				//Connection should be successfully re-established so return true.
@@ -47,10 +49,10 @@ bool mpd_reconnect(void)
 //MPD_STATE_PAUSE       = 3	playing, but paused
 uint8_t get_mpd_status(void)
 {
-	struct mpd_status *status_struct = mpd_run_status(connection);	//Create a struct "status_struct" and fill it with status info of "connection".
-	int status = mpd_status_get_state(status_struct);		//Pull the unknown/stop/play/pause status from "status_struct".
+	struct mpd_status *status_struct = mpd_run_status(connection);	//Create "status_struct" (contains status of "connection").
+	int status = mpd_status_get_state(status_struct);		//Pull the current status from "status_struct".
 
-	while ((status < MPD_STATE_STOP) || (status > MPD_STATE_PAUSE))	//While the status returned is anything other than STOP, PLAY or PAUSE...
+	while ((status < MPD_STATE_STOP) || (status > MPD_STATE_PAUSE))	//While the status is anything but STOP, PLAY or PAUSE...
 	{
 		while (mpd_reconnect() == FALSE) {};			//Attempt re-establishing the mpd connection.
 		status = mpd_status_get_state(status_struct);		//Re-check the current status.
@@ -62,19 +64,21 @@ uint8_t get_mpd_status(void)
 
 
 //Function to initialise the struct that reflects the state of the encoder hardware.
-struct encoder *init_encoder(uint8_t channel_a, uint8_t channel_b, uint8_t button_pin)
+struct encoder *init_encoder(const uint8_t channel_a, const uint8_t channel_b, const uint8_t button_pin)
 {
 	the_encoder = malloc(sizeof(struct encoder));	//Allocates heap memory for globally accessible "the_encoder".
 
-	the_encoder->channel_a = channel_a;		//Define the encoder channel a hardware pin.
-	the_encoder->channel_b = channel_b;		//Define the encoder channel b hardware pin.
-	the_encoder->last_code = 0;			//Initialise the last encoder code (for comparing to current code).
-	the_encoder->volume_delta = 0;			//Initialise the value of desired volume change.
+	//Allocate memory and initialise values of the encoder structure
+	the_encoder->channel_a = channel_a;		//Encoder channel a hardware pin.
+	the_encoder->channel_b = channel_b;		//Encoder channel b hardware pin.
+	the_encoder->last_code = 0;			//Last encoder code (for comparing to current code).
+	the_encoder->volume_delta = 0;			//Value of desired volume change.
 
 	the_encoder->button_pin = button_pin;		//Define the push-button hardware pin.
-	the_encoder->button_pressed_time = 0;		//Initialise the time when a button press (gone low) event is detected and validated.
-	the_encoder->button_released_time = 0;		//Initialise the time when a button release (gone high) event is detected and validated.
-	the_encoder->button_signal = SIGNAL_NULL;	//Initialise the control signal which is set based on button state (quick press to toggle, long press to stop).
+	the_encoder->button_pressed_time = 0;		//Initialise time when button press (low) is detected and validated.
+	the_encoder->button_released_time = 0;		//Initialise time when button release (high) is detected and validated.
+	the_encoder->button_signal = SIGNAL_NULL;	//Initialise the control signal which is set based on button state.
+							//(quick press to toggle, long press to stop).
 
 	if (gpioSetMode(channel_a, PI_INPUT)) return(FALSE);	//Set as input the pin to which the encoder channel a is connected.
 	if (gpioSetMode(channel_a, PI_INPUT)) return(FALSE);	//Set as input the pin to which the encoder channel b is connected.
@@ -84,9 +88,9 @@ struct encoder *init_encoder(uint8_t channel_a, uint8_t channel_b, uint8_t butto
 	if (gpioSetPullUpDown(channel_b, PI_PUD_UP)) return(FALSE);	//Enable pull-up resistor on channel b pin.
 	if (gpioSetPullUpDown(button_pin, PI_PUD_UP)) return(FALSE);	//Enable pull-up resistor on push-button pin.
 
-	if (gpioSetISRFunc(channel_a, EITHER_EDGE, 100, &volume_ISR)) return(FALSE);	//Enable hardware interrupt input on encoder channel a pin and define routine to run.
-	if (gpioSetISRFunc(channel_b, EITHER_EDGE, 100, &volume_ISR)) return(FALSE);	//Enable hardware interrupt input on encoder channel b pin and define routine to run.
-	if (gpioSetISRFunc(button_pin, EITHER_EDGE, 0, &button_ISR)) return(FALSE);	//Enable hardware interrupt input on push-button pin and define routine to run.
+	if (gpioSetISRFunc(channel_a, EITHER_EDGE, 100, &volume_ISR)) return(FALSE);	//Define routine to run on channel a int.
+	if (gpioSetISRFunc(channel_b, EITHER_EDGE, 100, &volume_ISR)) return(FALSE);	//Define routine to run on channel b int.
+	if (gpioSetISRFunc(button_pin, EITHER_EDGE, 0, &button_ISR)) return(FALSE);	//Define routine to run on button int.
 
 	return(the_encoder);	//Return address of "*the_encoder".
 }
@@ -100,33 +104,60 @@ void volume_ISR(int32_t gpio, int32_t level, uint32_t tick)
 	bool LSB = gpioRead(the_encoder->channel_b);	//Define least-significant bit from 2-bit encoder.
 
 	int code = (MSB << 1) | LSB;			//Define 2-bit value read from encoder.
-	int sum = (the_encoder->last_code << 2) | code;	//Define 4-bit value: 2 msb is the previous value from the encoder and 2 lsb is the current.
+	int sum = (the_encoder->last_code << 2) | code;	//Define 4-bit value:	2 msb is the previous value from the encoder.
+							//			2 lsb is the current value from the encoder.
+
+	//State table for determining rotation direction based on previous and current encoder channel values.
+	//  +--------Previous reading.
+	//  |    +---Current Reading
+	//  |    |
+	//| AB | AB | sum  | direction	| volume_delta	|
+	//| 00 | 00 | 0000 |   none	|      0	|
+	//| 00 | 01 | 0001 |   ccw	|     -1	|
+	//| 00 | 10 | 0010 |   cw	|      1	|
+	//| 00 | 11 | 0011 |   error	|      0	|
+	//| 01 | 00 | 0100 |   cw	|      1	|
+	//| 01 | 01 | 0101 |   none	|      0	|
+	//| 01 | 10 | 0110 |   error	|      0	|
+	//| 01 | 11 | 0111 |   ccw	|     -1	|
+	//| 10 | 00 | 1000 |   ccw	|     -1	|
+	//| 10 | 01 | 1001 |   error	|      0	|
+	//| 10 | 10 | 1010 |   none	|      0	|
+	//| 10 | 11 | 1011 |   cw	|      1	|
+	//| 11 | 00 | 1100 |   error	|      0	|
+	//| 11 | 01 | 1101 |   cw	|      1	|
+	//| 11 | 10 | 1110 |   ccw	|     -1	|
+	//| 11 | 11 | 1111 |   none	|      0	|
+
+	//Progression of 'sum' when turning clockwise:
+	//00 -> 10 -> 11 -> 01 -> 00
+	//Progression of 'sum' when turning counter-clockwise:
+	//00 -> 01 -> 11 -> 10 -> 00
 
 	//Use the following two lines to register every single pulse.
 	//That's 4 pulses per detent on ADA377 encoder.
-	//if(sum == 0b1101 || sum == 0b0100 || sum == 0b0010 || sum == 0b1011) the_encoder->value++;	//Turned clockwise.
-	//if(sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) the_encoder->value--;	//Turned counter-clockwise.
+	//if(sum == 0b0010 || sum == 0b1011 || sum == 0b1101 || sum == 0b0100) the_encoder->value++;	//Turned clockwise.
+	//if(sum == 0b0001 || sum == 0b0111 || sum == 0b1110 || sum == 0b1000) the_encoder->value--;	//Turned counter-clockwise.
 
-	//Use the following two lines to register only every fourth pulse.
-	//That's equivalent to a single pulse for every detent on ADA377 encoder.
-	if (sum == 0b0100 || sum == 0b1011) the_encoder->volume_delta++;	//Turned clockwise.
-	if (sum == 0b0111 || sum == 0b1000) the_encoder->volume_delta--;	//Turned counter-clockwise.
+	//Use the following two lines to register only every second pulse.
+	//That's equivalent to two pulses for every detent on ADA377 encoder.
+	if (sum == 0b0010 || sum == 0b1101) the_encoder->volume_delta++;	//Turned clockwise.
+	if (sum == 0b0001 || sum == 0b1110) the_encoder->volume_delta--;	//Turned counter-clockwise.
 
 	the_encoder->last_code = code;	//Update value of last_code for comparison the next time this ISR is triggered.
 }
 
 
-//Interrupt subroutine to be triggered by pressing the toggle button.
+//Interrupt subroutine to be triggered by pressing (or releasing) the toggle button.
 //The gpioSetISRFunc requires ISRs such as this to receive gpio, level and tick (renamed time).
 void button_ISR(int32_t gpio, int32_t level, uint32_t time)
 {
 	if (gpioRead(the_encoder->button_pin) == LOW) the_encoder->button_pressed_time = time;
 
-
 	if ((gpioRead(the_encoder->button_pin) == HIGH) && ((time - the_encoder->button_released_time) > DEBOUNCE_US))
 	{
 		if (the_encoder->button_signal == SIGNAL_STOP)	the_encoder->button_signal = SIGNAL_NULL;	//Clear stop signal.
-		else						the_encoder->button_signal = SIGNAL_TOGGLE;	//Or set toggle signal.
+		else						the_encoder->button_signal = SIGNAL_TOGGLE;	//Set toggle signal.
 
 		the_encoder->button_released_time = time;	//Reset the de-bounce timestamp.
 	}
@@ -138,10 +169,8 @@ void poll_long_press(struct encoder *enc)
 {
 	if ((gpioRead(enc->button_pin) == LOW) && ((gpioTick() - enc->button_pressed_time) > TOGGLE_BUTTON_LONG_PRESS)) 
 	{
-
 		enc->button_signal = SIGNAL_STOP;
 	}
-
 }
 
 
@@ -159,9 +188,9 @@ void update_mpd_state(volatile uint8_t *signal_address)
 	switch(*signal_address)
 	{
 		case SIGNAL_TOGGLE:
-			if (get_mpd_status() == MPD_STATE_PLAY)	mpd_run_pause(connection, TRUE);	//Currently playing, so pause.
-			else					mpd_run_play(connection);		//Currently paused or stopped, so play.
-			*signal_address = SIGNAL_NULL;							//Reset mpd state control signal.
+			if (get_mpd_status() == MPD_STATE_PLAY)	mpd_run_pause(connection, TRUE);	//Playing, so pause.
+			else					mpd_run_play(connection);		//Paused/stopped, so play.
+			*signal_address = SIGNAL_NULL;							//Reset mpd state signal.
 			break;
 		case SIGNAL_STOP:
 			mpd_run_stop(connection);	//Send the stop command.
@@ -173,9 +202,9 @@ void update_mpd_state(volatile uint8_t *signal_address)
 //Initialise the hardware inputs - two channels on the rotary encoder and a push-button.
 bool init_hardware(void)
 {
-	if (gpioInitialise() == PI_INIT_FAILED) return(FALSE);				//Initialise gpio pins on raspi, return false if failure.
+	if (gpioInitialise() == PI_INIT_FAILED) return(FALSE);				//Initialise gpio pins on raspi.
 
-	the_encoder = init_encoder(VOL_ENCODER_A_PIN, VOL_ENCODER_B_PIN, BUTTON_PIN);	//Initialise values stored in global struct "the_encoder".
+	the_encoder = init_encoder(VOL_ENCODER_A_PIN, VOL_ENCODER_B_PIN, BUTTON_PIN);	//Initialise global struct "the_encoder".
 	if (the_encoder == NULL) return(FALSE);						//Return false if initialisation fails.
 
 	return(TRUE);
@@ -192,16 +221,17 @@ int main(int argc, char *argv[])
 	pid_t pid = 0;	//Initialise pid (process id).
 	pid_t sid = 0;	//Initialise sid (session id).
 
-	pid = fork();					//Fork off from the parent process.  fork() should return PID of child process.
+	pid = fork();					//Fork off from the parent process.  fork() should return PID of child.
 	if (pid < 0)		exit(EXIT_FAILURE);	//If fork returns a value less than 0 then an error has occured.
-	if (pid > 0)		exit(EXIT_SUCCESS);	//if fork returns a positive value then we have successfully forked a child process from the parent process.
+	if (pid > 0)		exit(EXIT_SUCCESS);	//if fork returns a positive value then we have successfully forked.
 
-	umask(0);					//Unmask the file mode - allow the daemon to open, read and write any file anywhere.
+	umask(0);					//Unmask the file mode (allow daemon to open, read and write any file).
 
-	sid = setsid();					//Set new session and allocate session id.  if successful, child process is now process group leader.
-	if (sid < 0)		exit(EXIT_FAILURE);	//If setsid failed, exit.
+	sid = setsid();					//Set new session and allocate session id.  
+							//If successful, child process is now process group leader.
+	if (sid < 0)		exit(EXIT_FAILURE);	//Exit if setsid failed, otherwise child is now process group leader.
 
-	if ((chdir("/")) < 0)	exit(EXIT_FAILURE);	//Change working directory. If we can't find the directory we exit with failure.
+	if ((chdir("/")) < 0)	exit(EXIT_FAILURE);	//Change working directory. If can't find the directory, exit with failure.
 
 	//Daemons should not involve any standard user interaction, so close stdin, stdout and stderr.
 	close(STDIN_FILENO);
@@ -221,9 +251,9 @@ int main(int argc, char *argv[])
 		get_mpd_status();	//Loop until valid connection state. Keeps the connection alive.
 		gpioDelay(IDLE_DELAY);	//A delay so as to not max out cpu usage when running the main loop.
 
-		poll_long_press(the_encoder);							//Poll for a long hold of the button.
-		if (the_encoder->volume_delta)	update_mpd_volume(&the_encoder->volume_delta);	//Poll for a change in the encoder value.  If so, run update_volume().
-		if (the_encoder->button_signal)	update_mpd_state(&the_encoder->button_signal);	//Poll the state of the toggle_signal flag.  If set, run update_toggle().
+		poll_long_press(the_encoder);							//Poll for button long-press.
+		if (the_encoder->volume_delta)	update_mpd_volume(&the_encoder->volume_delta);	//Poll for encoder value change.
+		if (the_encoder->button_signal)	update_mpd_state(&the_encoder->button_signal);	//Poll toggle_signal flag.
 	}
 
 	return(-1);	//Never reached.

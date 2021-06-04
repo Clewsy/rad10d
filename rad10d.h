@@ -9,7 +9,7 @@
 #include <unistd.h>		//required for daemonisation.
 #include <sys/stat.h>		//required for daemonisation.
 
-#include <mpd/client.h>		//Required to interface with mpd.
+#include <mpd/client.h>		//Required to interface with mpd.  Refer to https://www.musicpd.org/libs/libmpdclient/
 #include <pigpio.h>		//Required for utilising raspberry pi gpio.
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,15 +49,15 @@
 //Define the structure that represents data from the encoder.
 struct encoder
 {
-	uint8_t channel_a;			//Hardware pin to which encoder A channel is connected.
-	uint8_t channel_b;			//Hardware pin to which encoder B channel is connected.
-	volatile uint8_t last_code;		//Last code detected by the encoder.  Compare with current code to determine direction of rotation.
-	volatile int8_t volume_delta;		//Positive or negative depending on direction encoder was turned.  Represents desired volume delta.
+	uint8_t channel_a;		//Hardware pin to which encoder A channel is connected.
+	uint8_t channel_b;		//Hardware pin to which encoder B channel is connected.
+	uint8_t last_code;		//Last code detected by the encoder.  Compare with current code to determine direction of rotation.
+	int8_t volume_delta;		//Positive or negative depending on direction encoder was turned.  Represents desired volume delta.
 
-	uint8_t button_pin;			//Hardware pin to which the push-buttonis connected.
-	volatile uint32_t button_pressed_time;	//Timestamp set whenever a button press is detected and validated (de-bounced).
-	volatile uint32_t button_released_time;	//Timestamp set whenever a button release is detected and validated (de-bounced).
-	volatile uint8_t button_signal;		//mpd control signal set by the push button.  SIGNAL_NULL, SIGNAL_TOGGLE or SIGNAL_STOP.
+	uint8_t button_pin;		//Hardware pin to which the push-buttonis connected.
+	uint32_t button_pressed_time;	//Timestamp set whenever a button press is detected and validated (de-bounced).
+	uint32_t button_released_time;	//Timestamp set whenever a button release is detected and validated (de-bounced).
+	uint8_t button_signal;		//mpd control signal set by the push button.  SIGNAL_NULL, SIGNAL_TOGGLE or SIGNAL_STOP.
 };
 
 
