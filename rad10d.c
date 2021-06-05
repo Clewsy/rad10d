@@ -81,7 +81,7 @@ struct encoder *init_encoder(const uint8_t channel_a, const uint8_t channel_b, c
 							//(quick press to toggle, long press to stop).
 
 	if (gpioSetMode(channel_a, PI_INPUT)) return(FALSE);	//Set as input the pin to which the encoder channel a is connected.
-	if (gpioSetMode(channel_a, PI_INPUT)) return(FALSE);	//Set as input the pin to which the encoder channel b is connected.
+	if (gpioSetMode(channel_b, PI_INPUT)) return(FALSE);	//Set as input the pin to which the encoder channel b is connected.
 	if (gpioSetMode(button_pin, PI_INPUT)) return(FALSE);	//Set as input the pin to which the push-button is connected.
 
 	if (gpioSetPullUpDown(channel_a, PI_PUD_UP)) return(FALSE);	//Enable pull-up resistor on channel a pin.
