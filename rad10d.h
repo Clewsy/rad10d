@@ -18,7 +18,7 @@
 #define FALSE	0
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Hardware definitions.  Pinout numbering for use with the pigpio is the same as the Broadcom chip numbering
+//Hardware definitions.  Pinout numbering for use with the pigpio is the same as the Broadcom chip numbering.
 //Note, the numbering is different to wiringPi library numbering.
 #define VOL_ENCODER_A_PIN	14	//Encoder channel A.
 #define VOL_ENCODER_B_PIN	15	//Encoder channel B.

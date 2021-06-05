@@ -109,7 +109,7 @@ void volume_ISR(int32_t gpio, int32_t level, uint32_t tick)
 
 	//State table for determining rotation direction based on previous and current encoder channel values.
 	//  +--------Previous reading.
-	//  |    +---Current Reading
+	//  |    +---Current reading.
 	//  |    |
 	//| AB | AB | sum  | direction	| volume_delta	|
 	//| 00 | 00 | 0000 |   none	|      0	|
@@ -129,9 +129,9 @@ void volume_ISR(int32_t gpio, int32_t level, uint32_t tick)
 	//| 11 | 10 | 1110 |   ccw	|     -1	|
 	//| 11 | 11 | 1111 |   none	|      0	|
 
-	//Progression of 'sum' when turning clockwise:
+	//Progression of AB when turning clockwise:
 	//00 -> 10 -> 11 -> 01 -> 00
-	//Progression of 'sum' when turning counter-clockwise:
+	//Progression of AB when turning counter-clockwise:
 	//00 -> 01 -> 11 -> 10 -> 00
 
 	//Use the following two lines to register every single pulse.
