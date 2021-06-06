@@ -34,7 +34,7 @@ ifneq ($(shell id -u), 0)
 	@echo Must be run as root.  Try: sudo make install
 else
 	install --mode=0755 --owner=root --group=root $(TARGET) $(INSTALL_DEST_BIN)
-	install --mode=0755 --owner=root --group=root $(TARGET).service $(INSTALL_DEST_SERVICE)
+	install --mode=0644 --owner=root --group=root $(TARGET).service $(INSTALL_DEST_SERVICE)
 	systemctl enable $(TARGET).service
 	systemctl start $(TARGET).service
 endif
