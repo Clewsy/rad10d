@@ -45,18 +45,11 @@
 #define IDLE_DELAY	10000		//Delay within the main loop to reduce cpu load (in microseconds).
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Define the structure that represents data from the encoder.
-struct encoder
+//Define a structure for conveniently storing button press/release timestamps
+struct button_timer
 {
-	uint8_t channel_a;		//Hardware pin to which encoder A channel is connected.
-	uint8_t channel_b;		//Hardware pin to which encoder B channel is connected.
-	uint8_t last_code;		//Last encoder values read.  Compare to current values to determine direction of rotation.
-	int8_t volume_delta;		//Positive or negative depending on direction encoder was turned.
-
-	uint8_t button_pin;		//Hardware pin to which the push-buttonis connected.
-	uint32_t button_pressed_time;	//Timestamp set whenever a button press is detected and validated (de-bounced).
-	uint32_t button_released_time;	//Timestamp set whenever a button release is detected and validated (de-bounced).
-	uint8_t button_signal;		//mpd control signal set by the push button.  SIGNAL_NULL, SIGNAL_TOGGLE or SIGNAL_STOP.
+	uint32_t pressed;	//Timestamp represents when the button goes low.
+	uint32_t released;	//Timestamp represents when the button goes high.
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,10 +58,10 @@ static struct mpd_connection *setup_connection(void);
 bool init_mpd(void);
 bool mpd_reconnect(void);
 uint8_t get_mpd_status(void);
-struct encoder *init_encoder(const uint8_t channel_a, const uint8_t channel_b, const uint8_t toggle_pin);
+bool init_encoder(void);
 void volume_ISR(int32_t gpio, int32_t level, uint32_t tick);
 void button_ISR(int32_t gpio, int32_t level, uint32_t tick);
-void poll_long_press(struct encoder *encoder_addr);
+void poll_long_press(uint8_t *signal_address);
+void update_mpd_state(uint8_t *signal_address);
 void update_mpd_volume(int8_t *delta_adddress);
-void update_mpd_state(volatile uint8_t *signal_address);
 bool init_hardware(void);
