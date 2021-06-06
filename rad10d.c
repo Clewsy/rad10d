@@ -5,7 +5,7 @@
 #include "rad10d.h"
 
 //Global declarations.
-struct encoder *the_encoder;			//Declare structure named the_encoder - gloablly accessible (used in ISR).
+struct encoder *encoder_addr;			//Declare structure stored at encoder_addr - gloablly accessible (used in ISR).
 struct mpd_connection *connection = NULL;	//Initialise globally accessible structure containing mpd connection.
 
 
@@ -21,7 +21,7 @@ static struct mpd_connection *setup_connection(void)
 }
 
 
-//Initialise the mpd connection.
+//Initialise the mpd connection.  Note variable "connection" is a pointer to a struct.
 bool init_mpd(void)
 {
 	connection = setup_connection();		//Initialise mpd connection session.
@@ -63,21 +63,21 @@ uint8_t get_mpd_status(void)
 }
 
 
-//Function to initialise the struct that reflects the state of the encoder hardware.
+//Function to initialise the struct that reflects the state of the encoder hardware.  Returns address of the initialised struct.
 struct encoder *init_encoder(const uint8_t channel_a, const uint8_t channel_b, const uint8_t button_pin)
 {
-	the_encoder = malloc(sizeof(struct encoder));	//Allocates heap memory for globally accessible "the_encoder".
+	encoder_addr = malloc(sizeof(struct encoder));	//Allocates heap memory at globally accessible address "encoder_addr".
 
 	//Allocate memory and initialise values of the encoder structure
-	the_encoder->channel_a = channel_a;		//Encoder channel a hardware pin.
-	the_encoder->channel_b = channel_b;		//Encoder channel b hardware pin.
-	the_encoder->last_code = 0;			//Last encoder code (for comparing to current code).
-	the_encoder->volume_delta = 0;			//Value of desired volume change.
+	encoder_addr->channel_a = channel_a;		//Encoder channel a hardware pin.
+	encoder_addr->channel_b = channel_b;		//Encoder channel b hardware pin.
+	encoder_addr->last_code = 0;			//Last encoder code (for comparing to current code).
+	encoder_addr->volume_delta = 0;			//Value of desired volume change.
 
-	the_encoder->button_pin = button_pin;		//Define the push-button hardware pin.
-	the_encoder->button_pressed_time = 0;		//Initialise time when button press (low) is detected and validated.
-	the_encoder->button_released_time = 0;		//Initialise time when button release (high) is detected and validated.
-	the_encoder->button_signal = SIGNAL_NULL;	//Initialise the control signal which is set based on button state.
+	encoder_addr->button_pin = button_pin;		//Define the push-button hardware pin.
+	encoder_addr->button_pressed_time = 0;		//Initialise time when button press (low) is detected and validated.
+	encoder_addr->button_released_time = 0;		//Initialise time when button release (high) is detected and validated.
+	encoder_addr->button_signal = SIGNAL_NULL;	//Initialise the control signal which is set based on button state.
 							//(quick press to toggle, long press to stop).
 
 	if (gpioSetMode(channel_a, PI_INPUT)) return(FALSE);	//Set as input the pin to which the encoder channel a is connected.
@@ -92,7 +92,7 @@ struct encoder *init_encoder(const uint8_t channel_a, const uint8_t channel_b, c
 	if (gpioSetISRFunc(channel_b, EITHER_EDGE, 100, &volume_ISR)) return(FALSE);	//Define routine to run on channel b int.
 	if (gpioSetISRFunc(button_pin, EITHER_EDGE, 0, &button_ISR)) return(FALSE);	//Define routine to run on button int.
 
-	return(the_encoder);	//Return address of "*the_encoder".
+	return(encoder_addr);	//Return address of encoder struct.
 }
 
 
@@ -100,34 +100,34 @@ struct encoder *init_encoder(const uint8_t channel_a, const uint8_t channel_b, c
 //The gpioSetISRFunc requires ISRs such as this to receive gpio, level and tick.  These values are ignored in this use-case.
 void volume_ISR(int32_t gpio, int32_t level, uint32_t tick)
 {
-	bool MSB = gpioRead(the_encoder->channel_a);	//Define most-significant bit from 2-bit encoder.
-	bool LSB = gpioRead(the_encoder->channel_b);	//Define least-significant bit from 2-bit encoder.
+	bool MSB = gpioRead(encoder_addr->channel_a);	//Define most-significant bit from 2-bit encoder.
+	bool LSB = gpioRead(encoder_addr->channel_b);	//Define least-significant bit from 2-bit encoder.
 
-	int code = (MSB << 1) | LSB;			//Define 2-bit value read from encoder.
-	int sum = (the_encoder->last_code << 2) | code;	//Define 4-bit value:	2 msb is the previous value from the encoder.
-							//			2 lsb is the current value from the encoder.
+	int code = (MSB << 1) | LSB;				//Define 2-bit value read from encoder.
+	int sum = (encoder_addr->last_code << 2) | code;	//Define 4-bit value:	2 msb : previous value from the encoder.
+								//			2 lsb : current value from the encoder.
 
 	//State table for determining rotation direction based on previous and current encoder channel values.
 	//  +--------Previous reading.
 	//  |    +---Current reading.
 	//  |    |
-	//| AB | AB | sum  | direction	| volume_delta	|
-	//| 00 | 00 | 0000 |   none	|      0	|
-	//| 00 | 01 | 0001 |   ccw	|     -1	|
-	//| 00 | 10 | 0010 |   cw	|      1	|
-	//| 00 | 11 | 0011 |   error	|      0	|
-	//| 01 | 00 | 0100 |   cw	|      1	|
-	//| 01 | 01 | 0101 |   none	|      0	|
-	//| 01 | 10 | 0110 |   error	|      0	|
-	//| 01 | 11 | 0111 |   ccw	|     -1	|
-	//| 10 | 00 | 1000 |   ccw	|     -1	|
-	//| 10 | 01 | 1001 |   error	|      0	|
-	//| 10 | 10 | 1010 |   none	|      0	|
-	//| 10 | 11 | 1011 |   cw	|      1	|
-	//| 11 | 00 | 1100 |   error	|      0	|
-	//| 11 | 01 | 1101 |   cw	|      1	|
-	//| 11 | 10 | 1110 |   ccw	|     -1	|
-	//| 11 | 11 | 1111 |   none	|      0	|
+	//| AB | AB | sum  | direction | volume_delta |
+	//| 00 | 00 | 0000 |   none    |      0       |
+	//| 00 | 01 | 0001 |   ccw     |     -1       |
+	//| 00 | 10 | 0010 |   cw      |      1       |
+	//| 00 | 11 | 0011 |   error   |      0       |
+	//| 01 | 00 | 0100 |   cw      |      1       |
+	//| 01 | 01 | 0101 |   none    |      0       |
+	//| 01 | 10 | 0110 |   error   |      0       |
+	//| 01 | 11 | 0111 |   ccw     |     -1       |
+	//| 10 | 00 | 1000 |   ccw     |     -1       |
+	//| 10 | 01 | 1001 |   error   |      0       |
+	//| 10 | 10 | 1010 |   none    |      0       |
+	//| 10 | 11 | 1011 |   cw      |      1       |
+	//| 11 | 00 | 1100 |   error   |      0       |
+	//| 11 | 01 | 1101 |   cw      |      1       |
+	//| 11 | 10 | 1110 |   ccw     |     -1       |
+	//| 11 | 11 | 1111 |   none    |      0       |
 
 	//Progression of AB when turning clockwise:
 	//00 -> 10 -> 11 -> 01 -> 00
@@ -136,53 +136,59 @@ void volume_ISR(int32_t gpio, int32_t level, uint32_t tick)
 
 	//Use the following two lines to register every single pulse.
 	//That's 4 pulses per detent on ADA377 encoder.
-	//if(sum == 0b0010 || sum == 0b1011 || sum == 0b1101 || sum == 0b0100) the_encoder->value++;	//Turned clockwise.
-	//if(sum == 0b0001 || sum == 0b0111 || sum == 0b1110 || sum == 0b1000) the_encoder->value--;	//Turned counter-clockwise.
+	//if(sum == 0b0010 || sum == 0b1011 || sum == 0b1101 || sum == 0b0100) encoder_addr->value++;	//Turned clockwise.
+	//if(sum == 0b0001 || sum == 0b0111 || sum == 0b1110 || sum == 0b1000) encoder_addr->value--;	//Turned counter-clockwise.
 
 	//Use the following two lines to register only every second pulse.
 	//That's equivalent to two pulses for every detent on ADA377 encoder.
-	if (sum == 0b0010 || sum == 0b1101) the_encoder->volume_delta++;	//Turned clockwise.
-	if (sum == 0b0001 || sum == 0b1110) the_encoder->volume_delta--;	//Turned counter-clockwise.
+	if (sum == 0b0010 || sum == 0b1101) encoder_addr->volume_delta++;	//Turned clockwise.
+	if (sum == 0b0001 || sum == 0b1110) encoder_addr->volume_delta--;	//Turned counter-clockwise.
 
-	the_encoder->last_code = code;	//Update value of last_code for comparison the next time this ISR is triggered.
+	encoder_addr->last_code = code;	//Update value of last_code for comparison the next time this ISR is triggered.
 }
 
 
 //Interrupt subroutine to be triggered by pressing (or releasing) the toggle button.
 //The gpioSetISRFunc requires ISRs such as this to receive gpio, level and tick (renamed time).
+//Note, action is only taken when the button is released.
 void button_ISR(int32_t gpio, int32_t level, uint32_t time)
 {
-	if (gpioRead(the_encoder->button_pin) == LOW) the_encoder->button_pressed_time = time;
+	//If button is pressed, record the current timestamp as ->button_pressed_time.
+	if (gpioRead(encoder_addr->button_pin) == LOW) encoder_addr->button_pressed_time = time;
 
-	if ((gpioRead(the_encoder->button_pin) == HIGH) && ((time - the_encoder->button_released_time) > DEBOUNCE_US))
+	//If button is not pressed and a time greater than the debounce has elapsed since button was pressed.
+	if ((gpioRead(encoder_addr->button_pin) == HIGH) && ((time - encoder_addr->button_released_time) > DEBOUNCE_US))
 	{
-		if (the_encoder->button_signal == SIGNAL_STOP)	the_encoder->button_signal = SIGNAL_NULL;	//Clear stop signal.
-		else						the_encoder->button_signal = SIGNAL_TOGGLE;	//Set toggle signal.
+		//A legitimate button press has been detected (debounced), so set the desired signal (triggers action in main).
+		if (encoder_addr->button_signal == SIGNAL_STOP)	encoder_addr->button_signal = SIGNAL_NULL;	//Set null signal.
+		else						encoder_addr->button_signal = SIGNAL_TOGGLE;	//Set toggle signal.
 
-		the_encoder->button_released_time = time;	//Reset the de-bounce timestamp.
+		encoder_addr->button_released_time = time;	//Reset the de-bounce timestamp.
 	}
 }
 
 
 //Function returns true if the toggle button has been held down for a specified duration (TOGGLE_BUTTON_LONG_PRESS microseconds).
-void poll_long_press(struct encoder *enc)
+void poll_long_press(struct encoder *encoder_addr)
 {
-	if ((gpioRead(enc->button_pin) == LOW) && ((gpioTick() - enc->button_pressed_time) > TOGGLE_BUTTON_LONG_PRESS)) 
+	//If the button is pressed and has been pressed for a duration greater than the period that definbes a "long press".
+	if	((gpioRead(encoder_addr->button_pin) == LOW) &&
+		((gpioTick() - encoder_addr->button_pressed_time) > TOGGLE_BUTTON_LONG_PRESS)) 
 	{
-		enc->button_signal = SIGNAL_STOP;
+		encoder_addr->button_signal = SIGNAL_STOP; //Set stop signal.  Cleared by button_ISR when button is released.
 	}
 }
 
 
 //Triggered in the main loop by polling for a change in the encoder value.
-void update_mpd_volume(volatile int8_t *delta_address)
+void update_mpd_volume(int8_t *delta_address)
 {
 	mpd_run_change_volume(connection, *delta_address);	//Change the volume.
 	*delta_address = 0;					//Clear the desired volume delta.
 }
 
 
-//Triggered in the main loop by polling the toggle flag being set (by ISR).
+//Triggered in the main loop by polling the toggle flag (set by ISR).
 void update_mpd_state(volatile uint8_t *signal_address)
 {	
 	switch(*signal_address)
@@ -204,8 +210,8 @@ bool init_hardware(void)
 {
 	if (gpioInitialise() == PI_INIT_FAILED) return(FALSE);				//Initialise gpio pins on raspi.
 
-	the_encoder = init_encoder(VOL_ENCODER_A_PIN, VOL_ENCODER_B_PIN, BUTTON_PIN);	//Initialise global struct "the_encoder".
-	if (the_encoder == NULL) return(FALSE);						//Return false if initialisation fails.
+	encoder_addr = init_encoder(VOL_ENCODER_A_PIN, VOL_ENCODER_B_PIN, BUTTON_PIN);	//Init global struct at "encoder_addr".
+	if (encoder_addr == NULL) return(FALSE);					//Return false if initialisation fails.
 
 	return(TRUE);
 }
@@ -251,9 +257,9 @@ int main(int argc, char *argv[])
 		get_mpd_status();	//Loop until valid connection state. Keeps the connection alive.
 		gpioDelay(IDLE_DELAY);	//A delay so as to not max out cpu usage when running the main loop.
 
-		poll_long_press(the_encoder);							//Poll for button long-press.
-		if (the_encoder->volume_delta)	update_mpd_volume(&the_encoder->volume_delta);	//Poll for encoder value change.
-		if (the_encoder->button_signal)	update_mpd_state(&the_encoder->button_signal);	//Poll toggle_signal flag.
+		poll_long_press(encoder_addr);								//Poll for button hold.
+		if (encoder_addr->volume_delta)		update_mpd_volume(&encoder_addr->volume_delta);	//Poll for encoder change.
+		if (encoder_addr->button_signal)	update_mpd_state(&encoder_addr->button_signal);	//Poll toggle_signal flag.
 	}
 
 	return(-1);	//Never reached.
