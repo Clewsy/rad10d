@@ -92,18 +92,19 @@ void volume_ISR(int32_t gpio, int32_t level, uint32_t tick)
 {
 	static uint8_t last_code = 0;	//Static so that value is remembered every time this ISR is triggered,
 
-	bool MSB = gpioRead(VOL_ENCODER_A_PIN);	//Define most-significant bit from 2-bit encoder.
-	bool LSB = gpioRead(VOL_ENCODER_B_PIN);	//Define least-significant bit from 2-bit encoder.
+	bool msb = gpioRead(VOL_ENCODER_A_PIN);	//Define most-significant bit from 2-bit encoder.
+	bool lsb = gpioRead(VOL_ENCODER_B_PIN);	//Define least-significant bit from 2-bit encoder.
 
-	uint8_t code = (MSB << 1) | LSB;	//Read 2-bit value read from encoder.
-	uint8_t sum = (last_code << 2) | code;	//Set 4-bit value:	2 msb : previous value from the encoder.
+	uint8_t code = (msb << 1) | lsb;	//Read 2-bit value read from encoder.
+	uint8_t abab = (last_code << 2) | code;	//Set 4-bit value:	2 msb : previous value from the encoder.
 						//			2 lsb : current value from the encoder.
 
 	//State table for determining rotation direction based on previous and current encoder channel values.
-	//  +--------Previous reading.
-	//  |    +---Current reading.
-	//  |    |
-	//| AB | AB | sum  | direction | volume_delta |
+	//  +--------------Previous reading.
+	//  |    +---------Current reading.
+	//  |    |    +----Combined binary value (variable abab).
+	//  |    |    |
+	//| AB | AB | ABAB | direction | volume_delta |
 	//| 00 | 00 | 0000 |   none    |      0       |
 	//| 00 | 01 | 0001 |   ccw     |     -1       |
 	//| 00 | 10 | 0010 |   cw      |      1       |
@@ -128,13 +129,13 @@ void volume_ISR(int32_t gpio, int32_t level, uint32_t tick)
 
 	//Use the following two lines to register every single pulse.
 	//That's 4 pulses per detent on ADA377 encoder.
-	//if(sum == 0b0010 || sum == 0b1011 || sum == 0b1101 || sum == 0b0100) volume_delta++;	//Turned clockwise.
-	//if(sum == 0b0001 || sum == 0b0111 || sum == 0b1110 || sum == 0b1000) volume_delta--;	//Turned counter-clockwise.
+	//if(abab == 0b0010 || abab == 0b1011 || abab == 0b1101 || abab == 0b0100) volume_delta++;	//Turned clockwise.
+	//if(abab == 0b0001 || abab == 0b0111 || abab == 0b1110 || abab == 0b1000) volume_delta--;	//Turned counter-clockwise.
 
 	//Use the following two lines to register only every second pulse.
 	//That's equivalent to two pulses for every detent on ADA377 encoder.
-	if (sum == 0b0010 || sum == 0b1101) volume_delta++;	//Turned clockwise.
-	if (sum == 0b0001 || sum == 0b1110) volume_delta--;	//Turned counter-clockwise.
+	if (abab == 0b0010 || abab == 0b1101) volume_delta++;	//Turned clockwise.
+	if (abab == 0b0001 || abab == 0b1110) volume_delta--;	//Turned counter-clockwise.
 
 	last_code = code;	//Update value of last_code for comparison the next time this ISR is triggered.
 }
