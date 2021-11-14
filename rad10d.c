@@ -146,10 +146,11 @@ void volume_ISR(int32_t gpio, int32_t level, uint32_t tick)
 //Note, action is only taken when the button is released.
 void button_ISR(int32_t gpio, int32_t level, uint32_t time)
 {
-	//If button is pressed, record the current timestamp as button_time.pressed.
+	//If button is pressed, record the current timestamp as button_time.pressed (needed when polling for long-press).
 	if (gpioRead(BUTTON_PIN) == LOW) button_time.pressed = time;
 
-	//If button is not pressed and a time greater than the debounce has elapsed since button was pressed.
+	//If button is not pressed and a time greater than the debounce has elapsed since the last debounced button release.
+	//I.e. first "bounce" registered as the release, subsequent bounces within DEBOUNCE period are ignored.
 	if ((gpioRead(BUTTON_PIN) == HIGH) && ((time - button_time.released) > DEBOUNCE_US))
 	{
 		//A legitimate button press has been detected (debounced), so set the desired signal (triggers action in main).
@@ -164,7 +165,7 @@ void button_ISR(int32_t gpio, int32_t level, uint32_t time)
 //Function returns true if the toggle button has been held down for a specified duration (TOGGLE_BUTTON_LONG_PRESS microseconds).
 void poll_long_press(uint8_t *signal_address)
 {
-	//If the button is pressed and has been pressed for a duration greater than the period that definbes a "long press".
+	//If the button is pressed and has been pressed for a duration greater than the period that defines a "long press".
 	if	((gpioRead(BUTTON_PIN) == LOW) && ((gpioTick() - button_time.pressed) > TOGGLE_BUTTON_LONG_PRESS)) 
 	{
 		*signal_address = SIGNAL_STOP; //Set stop signal.  Cleared by button_ISR when button is released.
