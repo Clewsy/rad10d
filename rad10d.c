@@ -162,11 +162,11 @@ void button_ISR(int32_t gpio, int32_t level, uint32_t time)
 }
 
 
-//Function returns true if the toggle button has been held down for a specified duration (TOGGLE_BUTTON_LONG_PRESS microseconds).
+//Function returns true if the toggle button has been held down for a specified duration (TOGGLE_BUTTON_LONG_PRESS_US microseconds).
 void poll_long_press(uint8_t *signal_address)
 {
 	//If the button is pressed and has been pressed for a duration greater than the period that defines a "long press".
-	if	((gpioRead(BUTTON_PIN) == LOW) && ((gpioTick() - button_time.pressed) > TOGGLE_BUTTON_LONG_PRESS)) 
+	if	((gpioRead(BUTTON_PIN) == LOW) && ((gpioTick() - button_time.pressed) > TOGGLE_BUTTON_LONG_PRESS_US)) 
 	{
 		*signal_address = SIGNAL_STOP; //Set stop signal.  Cleared by button_ISR when button is released.
 	}
@@ -246,7 +246,7 @@ int main(int argc, char *argv[])
 	while (TRUE)
 	{
 		get_mpd_status();	//Loop until valid connection state. Keeps the connection alive.
-		gpioDelay(IDLE_DELAY);	//A delay so as to not max out cpu usage when running the main loop.
+		gpioDelay(IDLE_DELAY_US);	//A delay so as to not max out cpu usage when running the main loop.
 
 		poll_long_press(&mpd_control_signal);				//Poll for button hold (will send stop signal).
 		if (volume_delta)	update_mpd_volume(&volume_delta);	//Poll for encoder change (volume delta).
